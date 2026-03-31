@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ZeroDesperdício — Protótipo Funcional</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    font-family: system-ui, sans-serif; 
+    background: #f4f2ed; /* Fundo externo (computador) neutro */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    color: #1a1a18;
+}
+
+/* Cores principais atualizadas */
+:root {
+  --g1: #376C41;   /* verde solicitado */
+  --g2: #4A8B56;   /* verde médio */
+  --g3: #EAF2EC;   /* verde claro fundo */
+  --o1: #DA4A02;   /* laranja solicitado */
+  --o2: #E86524;   /* laranja médio */
+  --o3: #FCEBE3;   /* laranja claro fundo */
+  --neu: #f8f7f3;  /* neutro claro */
+  --brd: #e2e0d8;  /* borda */
+  --txt: #1a1a18;  /* texto primário */
+  --mu: #888780;   /* texto muted */
+}
+
+/* Container do Celular Funcional */
+.phone {
+    width: 320px;
+    height: 650px;
+    border-radius: 36px;
+    border: 8px solid #333;
+    background: #FFDDAE; /* Cor de fundo base do celular, se precisar */
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Telas (Screens) */
+.screen {
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    background: #FFDDAE; /* Fundo das telas do aplicativo como solicitado */
+}
+.screen.active {
+    display: flex; /* Mostra a tela ativa */
+}
+.content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Elementos globais */
+.sb { height: 22px; background: var(--g1); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; flex-shrink: 0; }
+.sbt { font-size: 9px; color: rgba(255,255,255,.9); font-weight: 500; }
+.hdr-g { background: var(--g1); padding: 12px 14px; flex-shrink: 0; }
+.ht { font-size: 14px; font-weight: 600; color: #fff; }
+.hs { font-size: 10px; color: rgba(255,255,255,.8); margin-top: 2px; }
+.hb { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+
+/* Botões e Inputs */
+.btn-g { background: var(--g1); color: #fff; border: none; border-radius: 10px; padding: 12px 0; font-size: 13px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s;}
+.btn-g:active { opacity: 0.8; }
+.btn-o { background: var(--o1); color: #fff; border: none; border-radius: 10px; padding: 12px 0; font-size: 13px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s;}
+.btn-o:active { opacity: 0.8; }
+.btn-out-g { background: transparent; color: var(--g1); border: 1.5px solid var(--g1); border-radius: 10px; padding: 11px 0; font-size: 13px; font-weight: 600; width: 100%; cursor: pointer; transition: 0.2s;}
+.btn-out-g:active { background: var(--g3); }
+.inp { width: 100%; border: 1px solid var(--brd); border-radius: 8px; padding: 10px 12px; font-size: 13px; background: #fff; color: var(--txt); outline: none; transition: 0.2s; }
+.inp:focus { border-color: var(--g1); }
+
+/* Tags & Misc */
+.mu { font-size: 11px; color: #666; }
+.sl { font-size: 10px; font-weight: 700; color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+.tgg { display: inline-block; font-size: 9px; padding: 3px 8px; border-radius: 20px; font-weight: 600; background: var(--g3); color: var(--g1); }
+.tgo { display: inline-block; font-size: 9px; padding: 3px 8px; border-radius: 20px; font-weight: 600; background: var(--o3); color: var(--o1); }
+.tgr { display: inline-block; font-size: 9px; padding: 3px 8px; border-radius: 20px; font-weight: 600; background: #FCEBEB; color: #791F1F; }
+.pill-o { background: var(--o1); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.pill-g { background: var(--g1); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+/* Navbar Inferior */
+.nb { display: flex; border-top: 1px solid var(--brd); padding: 10px 0 8px; background: #fff; flex-shrink: 0; }
+.ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.nt { font-size: 9px; color: #bbb; font-weight: 500; }
+.nt.on { color: var(--o1); font-weight: 700; }
+.ni span.icon { font-size: 16px; filter: grayscale(100%) opacity(0.5); }
+.ni.on span.icon { filter: none; }
+
+/* Cards */
+.ci { border: 1px solid var(--brd); border-radius: 10px; padding: 12px; margin-bottom: 8px; background: #fff;}
+.ci-o { border: 1px solid var(--o2); border-radius: 10px; padding: 12px; background: #fff; margin-bottom: 8px;}
+.stripe-g { border-left: 4px solid var(--g1); padding-left: 10px; }
+.stripe-o { border-left: 4px solid var(--o1); padding-left: 10px; }
+.sp { border: none; border-top: 1px solid var(--brd); margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+    <div class="sb"><span class="sbt">9:41</span><span class="sbt">●●●</span></div>
+
+    <div id="t01" class="screen active">
+        <div style="background:var(--g1);padding:40px 18px 30px;display:flex;flex-direction:column;align-items:center;gap:14px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+            <div style="width:70px;height:70px;background:#fff;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:35px">🌱</div>
+            <div style="text-align:center">
+                <div style="font-size:24px;font-weight:700;color:#fff">ZeroDesperdício</div>
+                <div style="font-size:13px;color:rgba(255,255,255,.8);margin-top:6px;">Comida boa não deve ir pro lixo.</div>
+            </div>
+        </div>
+        <div style="padding:30px 20px;display:flex;flex-direction:column;gap:16px;flex:1;justify-content:center;">
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;background:var(--o3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🍱</div><div class="mu" style="font-size:13px;color:#444">Doe o excesso em minutos</div></div>
+                <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;background:var(--g3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📍</div><div class="mu" style="font-size:13px;color:#444">Encontre doações perto de você</div></div>
+                <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;background:var(--o3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🤝</div><div class="mu" style="font-size:13px;color:#444">Cada retirada faz diferença</div></div>
+            </div>
+            <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+                <button class="btn-o" onclick="goTo('t02')">Entrar</button>
+                <button class="btn-out-g" onclick="goTo('t03')">Criar conta</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="t02" class="screen">
+        <div class="hdr-g" style="text-align:center;padding:30px 16px 20px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+            <div style="font-size:22px;font-weight:700;color:#fff">Bem-vindo</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:5px">Acesse sua conta para continuar</div>
+        </div>
+        <div style="padding:30px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+            <input class="inp" placeholder="E-mail" type="email" value="restaurante@exemplo.com"/>
+            <input class="inp" placeholder="Senha" type="password" value="123456"/>
+            <div style="text-align:right;margin-top:-5px"><span style="font-size:11px;color:var(--o1);cursor:pointer;font-weight:600">Esqueci minha senha</span></div>
+            
+            <button class="btn-g" onclick="goTo('t04')" style="margin-top:10px;">Entrar (Doador)</button>
+            <button class="btn-o" onclick="goTo('t11')" style="margin-top:-5px;">Entrar (Receptor)</button>
+            
+            <div style="display:flex;align-items:center;gap:8px;margin:10px 0;"><div style="flex:1;height:1px;background:#d8bfa0"></div><span class="mu">ou</span><div style="flex:1;height:1px;background:#d8bfa0"></div></div>
+            <div style="border:1px solid #d8bfa0;border-radius:10px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;background:#fff">
+                <span style="font-size:16px;font-weight:700;color:#4285F4">G</span><span style="font-size:13px;color:var(--txt)">Continuar com Google</span>
+            </div>
+            <div style="text-align:center;margin-top:auto;"><span class="mu">Não tem conta? </span><span style="font-size:12px;color:var(--o1);cursor:pointer;font-weight:700" onclick="goTo('t03')">Cadastre-se</span></div>
+        </div>
+    </div>
+
+    <div id="t03" class="screen">
+        <div class="hdr-g">
+            <div class="hb" onclick="goTo('t01')"><span style="color:#fff;font-size:18px">←</span><span class="ht">Criar conta</span></div>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;">
+            <div class="sl">Escolha seu perfil</div>
+            <div style="display:flex;gap:10px">
+                <div style="flex:1;padding:16px 10px;border-radius:12px;border:2px solid var(--g1);text-align:center;cursor:pointer;background:#fff">
+                    <div style="font-size:24px">🏪</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--g1);margin-top:6px">Doador</div>
+                    <div style="font-size:10px;color:#555;margin-top:2px">Rest. / Mercado</div>
+                </div>
+                <div style="flex:1;padding:16px 10px;border-radius:12px;border:2px solid transparent;text-align:center;cursor:pointer;background:rgba(255,255,255,0.5)" onclick="this.style.borderColor='var(--o1)'; this.style.background='#fff'; this.previousElementSibling.style.borderColor='transparent'; this.previousElementSibling.style.background='rgba(255,255,255,0.5)';">
+                    <div style="font-size:24px">🤝</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--o1);margin-top:6px">Receptor</div>
+                    <div style="font-size:10px;color:#555;margin-top:2px">ONG / Pessoa</div>
+                </div>
+            </div>
+            <input class="inp" placeholder="Nome completo"/>
+            <input class="inp" placeholder="E-mail" type="email"/>
+            <input class="inp" placeholder="Telefone" type="tel"/>
+            <input class="inp" placeholder="Senha" type="password"/>
+            
+            <button class="btn-g" onclick="goTo('t04')" style="margin-top:10px;">Finalizar Cadastro</button>
+        </div>
+    </div>
+
+    <div id="t04" class="screen">
+        <div class="content-scroll">
+            <div style="background:var(--g1);padding:20px 16px 20px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+                <div class="ht" style="font-size:18px;">Olá, João 👋</div>
+                <div class="hs" style="font-size:12px;">Restaurante Sol Nascente</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+                    <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#fff">3</div><div style="font-size:11px;color:rgba(255,255,255,.9)">ativas</div></div>
+                    <div style="background:var(--o1);border-radius:12px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#fff">2</div><div style="font-size:11px;color:rgba(255,255,255,.9)">pendentes</div></div>
+                </div>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+                <button class="btn-o" onclick="goTo('t05')">+ Nova doação</button>
+                <div class="sl" style="margin-top:10px;">Solicitações recentes</div>
+                
+                <div class="ci-o" onclick="goTo('t07')" style="cursor:pointer;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="font-size:14px;font-weight:700;color:var(--txt)">ONG Vida Nova</div><span class="tgo">pendente</span></div>
+                    <div class="mu" style="margin-top:4px;font-size:12px;">Marmitas prontas · 5 unid.</div>
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                        <button style="flex:1;background:var(--g1);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:12px;font-weight:600;cursor:pointer">✓ Aceitar</button>
+                        <button style="flex:1;background:#FCEBEB;color:#791F1F;border:none;border-radius:8px;padding:8px 0;font-size:12px;cursor:pointer">✗ Recusar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nb">
+            <div class="ni on" onclick="goTo('t04')"><span class="icon">🏠</span><span class="nt on">Início</span></div>
+            <div class="ni" onclick="goTo('t06')"><span class="icon">📋</span><span class="nt">Doações</span></div>
+            <div class="ni" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt">Chat</span></div>
+            <div class="ni" onclick="goTo('t09')"><span class="icon">📊</span><span class="nt">Histórico</span></div>
+            <div class="ni" onclick="goTo('t10')"><span class="icon">👤</span><span class="nt">Perfil</span></div>
+        </div>
+    </div>
+
+    <div id="t05" class="screen">
+        <div class="hdr-g">
+            <div class="hb" onclick="goTo('t04')"><span style="color:#fff;font-size:18px">←</span><span class="ht">Cadastrar doação</span></div>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px;flex:1;overflow-y:auto;">
+            <div><div class="sl">Tipo de alimento</div>
+                <select class="inp"><option>Pronto para consumo</option><option>Perecível</option><option>Grãos e cereais</option><option>Hortifruti</option></select>
+            </div>
+            <div><div class="sl">Descrição</div>
+                <input class="inp" placeholder="Ex: Marmitas de frango com arroz"/>
+            </div>
+            <div><div class="sl">Quantidade</div>
+                <div style="display:flex;gap:10px">
+                    <input class="inp" placeholder="10" type="number" style="flex:1"/>
+                    <select class="inp" style="flex:1"><option>unidades</option><option>kg</option><option>litros</option></select>
+                </div>
+            </div>
+            <div><div class="sl">Disponível até</div><input class="inp" type="datetime-local"/></div>
+            <div><div class="sl">Local de retirada</div>
+                <div style="background:#fff;border:1px solid var(--g1);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer">
+                    <span style="font-size:16px">📍</span><span style="font-size:13px;color:var(--g1);font-weight:600">Usar localização atual</span>
+                </div>
+            </div>
+            <div><div class="sl">Foto (opcional)</div>
+                <div style="background:rgba(255,255,255,0.5);border:2px dashed #d8bfa0;border-radius:8px;padding:24px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <span style="font-size:13px;color:var(--mu)">+ Adicionar foto da comida</span>
+                </div>
+            </div>
+            <button class="btn-g" onclick="goTo('t06')" style="margin-top:auto;">Publicar doação</button>
+        </div>
+    </div>
+
+    <div id="t06" class="screen">
+        <div class="hdr-g"><div class="ht" style="font-size:16px;">Minhas doações</div></div>
+        <div class="content-scroll" style="padding:16px;gap:10px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;overflow-x:auto;padding-bottom:5px;">
+                <span class="pill-g">Todas</span>
+                <span style="font-size:11px;padding:4px 12px;border-radius:20px;background:#fff;color:var(--mu);cursor:pointer;font-weight:600;border:1px solid #d8bfa0">Ativas</span>
+                <span style="font-size:11px;padding:4px 12px;border-radius:20px;background:#fff;color:var(--mu);cursor:pointer;font-weight:600;border:1px solid #d8bfa0">Concluídas</span>
+            </div>
+            <div class="ci stripe-g" onclick="goTo('t07')" style="cursor:pointer;">
+                <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Marmitas prontas</span><span class="tgg">ativa</span></div>
+                <div class="mu" style="margin-top:4px;">10 unid. · Pronto para consumo</div>
+                <div class="sp"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span class="mu" style="font-weight:600;color:var(--o1)">2 solicitações pendentes</span><span style="font-size:12px;color:var(--g1);font-weight:700">Ver →</span>
+                </div>
+            </div>
+            <div class="ci stripe-g">
+                <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Arroz e feijão</span><span class="tgg">ativa</span></div>
+                <div class="mu" style="margin-top:4px;">5 kg · Grãos e cereais</div>
+                <div class="sp"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span class="mu">Nenhuma solicitação ainda</span>
+                </div>
+            </div>
+            <div class="ci" style="opacity:0.7;">
+                <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Pão de forma</span><span style="font-size:9px;padding:3px 8px;border-radius:20px;font-weight:600;background:#E8E6DF;color:#5F5E5A">expirada</span></div>
+                <div class="mu" style="margin-top:4px;">20 unid. · Perecível</div>
+            </div>
+        </div>
+        <div class="nb">
+            <div class="ni" onclick="goTo('t04')"><span class="icon">🏠</span><span class="nt">Início</span></div>
+            <div class="ni on" onclick="goTo('t06')"><span class="icon">📋</span><span class="nt on">Doações</span></div>
+            <div class="ni" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt">Chat</span></div>
+            <div class="ni" onclick="goTo('t09')"><span class="icon">📊</span><span class="nt">Histórico</span></div>
+            <div class="ni" onclick="goTo('t10')"><span class="icon">👤</span><span class="nt">Perfil</span></div>
+        </div>
+    </div>
+
+    <div id="t07" class="screen">
+        <div class="hdr-g">
+            <div class="hb" onclick="goTo('t04')"><span style="color:#fff;font-size:18px">←</span><span class="ht">Detalhe da doação</span></div>
+        </div>
+        <div class="content-scroll" style="padding:16px;gap:12px;">
+            <div class="ci stripe-g" style="border-width:2px;border-color:var(--g1)">
+                <div style="font-size:18px;font-weight:700;color:var(--g1)">Marmitas prontas</div>
+                <div class="mu" style="margin-top:4px;font-size:13px;">10 unidades · Pronto p/ consumo</div>
+                <div class="sp"></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;justify-content:space-between"><span class="mu">Local de Retirada</span><span style="font-size:12px;font-weight:600">Rua das Flores, 123</span></div>
+                    <div style="display:flex;justify-content:space-between"><span class="mu">Disponível até</span><span style="font-size:12px;font-weight:600">Hoje, 20:00</span></div>
+                    <div style="display:flex;justify-content:space-between"><span class="mu">Status Atual</span><span class="tgg">Ativa no app</span></div>
+                </div>
+            </div>
+            
+            <div class="sl" style="margin-top:10px;">Solicitações recebidas (2)</div>
+            
+            <div class="ci-o">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div><div style="font-size:14px;font-weight:700">ONG Vida Nova</div><div class="mu">Quer 5 unidades · há 10 min</div></div>
+                    <span class="tgo">pendente</span>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:12px">
+                    <button style="flex:2;background:var(--g1);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:12px;font-weight:600;cursor:pointer">✓ Aceitar</button>
+                    <button style="flex:1;background:#FCEBEB;color:#791F1F;border:none;border-radius:8px;padding:8px 0;font-size:12px;cursor:pointer">✗ Recusar</button>
+                    <button style="flex:1;background:var(--o1);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:14px;cursor:pointer" onclick="goTo('t08')">💬</button>
+                </div>
+            </div>
+            
+            <div class="ci">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div><div style="font-size:14px;font-weight:700">Maria Oliveira</div><div class="mu">Quer 3 unidades · há 25 min</div></div>
+                    <span class="tgo">pendente</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="t08" class="screen">
+        <div class="hdr-g"><div class="ht" style="font-size:16px;">Mensagens</div></div>
+        <div class="content-scroll">
+            <div style="padding:16px;border-bottom:1px solid #d8bfa0;display:flex;align-items:center;gap:12px;cursor:pointer;background:rgba(255,255,255,0.4)">
+                <div style="width:46px;height:46px;background:#fff;border:2px solid var(--g1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--g1);flex-shrink:0">ON</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:14px;font-weight:700;color:var(--txt)">ONG Vida Nova</div>
+                    <div style="font-size:12px;color:var(--g1);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">Pode vir buscar às 18h!</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                    <div style="font-size:10px;color:var(--mu)">14:32</div>
+                    <div style="width:20px;height:20px;background:var(--o1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700">1</div>
+                </div>
+            </div>
+            <div style="padding:16px;border-bottom:1px solid #d8bfa0;display:flex;align-items:center;gap:12px;cursor:pointer">
+                <div style="width:46px;height:46px;background:#fff;border:2px solid var(--o1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--o1);flex-shrink:0">MO</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:14px;font-weight:700;color:var(--txt)">Maria Oliveira</div>
+                    <div style="font-size:12px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">Vou buscar às 19h, tudo bem?</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                    <div style="font-size:10px;color:var(--mu)">13:05</div>
+                </div>
+            </div>
+        </div>
+        <div class="nb">
+            <div class="ni" onclick="goTo('t04')"><span class="icon">🏠</span><span class="nt">Início</span></div>
+            <div class="ni" onclick="goTo('t06')"><span class="icon">📋</span><span class="nt">Doações</span></div>
+            <div class="ni on" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt on">Chat</span></div>
+            <div class="ni" onclick="goTo('t09')"><span class="icon">📊</span><span class="nt">Histórico</span></div>
+            <div class="ni" onclick="goTo('t10')"><span class="icon">👤</span><span class="nt">Perfil</span></div>
+        </div>
+    </div>
+
+    <div id="t09" class="screen">
+        <div class="hdr-g"><div class="ht" style="font-size:16px;">Histórico de Impacto</div></div>
+        <div class="content-scroll" style="padding:16px;gap:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div style="background:#fff;border-radius:12px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--g1)">14</div><div class="mu" style="font-size:10px;margin-top:4px;">concluídas</div></div>
+                <div style="background:#fff;border-radius:12px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--o1)">2</div><div class="mu" style="font-size:10px;margin-top:4px;">canceladas</div></div>
+                <div style="background:#fff;border:1px solid #d8bfa0;border-radius:12px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--g1)">38</div><div class="mu" style="font-size:10px;margin-top:4px;">kg salvos</div></div>
+            </div>
+            
+            <div class="sl">Doações Passadas</div>
+            <div class="ci stripe-g"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700">Marmitas prontas</span><span class="tgg">concluída</span></div><div class="mu" style="margin-top:4px;">Entregue p/ ONG Vida Nova · 5 unid.</div><div class="mu" style="font-size:10px;margin-top:6px;color:#888">12 mar 2026, 18:00</div></div>
+            <div class="ci stripe-g"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700">Arroz e feijão</span><span class="tgg">concluída</span></div><div class="mu" style="margin-top:4px;">Entregue p/ Maria Oliveira · 3 kg</div><div class="mu" style="font-size:10px;margin-top:6px;color:#888">05 mar 2026, 10:30</div></div>
+            <div class="ci stripe-o"><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700">Pão de forma</span><span class="tgr">cancelada</span></div><div class="mu" style="margin-top:4px;">Ninguém solicitou · 20 unid.</div><div class="mu" style="font-size:10px;margin-top:6px;color:#888">28 fev 2026</div></div>
+        </div>
+        <div class="nb">
+            <div class="ni" onclick="goTo('t04')"><span class="icon">🏠</span><span class="nt">Início</span></div>
+            <div class="ni" onclick="goTo('t06')"><span class="icon">📋</span><span class="nt">Doações</span></div>
+            <div class="ni" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt">Chat</span></div>
+            <div class="ni on" onclick="goTo('t09')"><span class="icon">📊</span><span class="nt on">Histórico</span></div>
+            <div class="ni" onclick="goTo('t10')"><span class="icon">👤</span><span class="nt">Perfil</span></div>
+        </div>
+    </div>
+
+    <div id="t10" class="screen">
+        <div style="background:var(--g1);padding:30px 20px 20px;text-align:center;border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+            <div style="width:70px;height:70px;background:var(--o1);border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.4)">JR</div>
+            <div style="font-size:18px;font-weight:700;color:#fff">João Restaurante</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:4px">Doador · Fortaleza, CE</div>
+        </div>
+        <div class="content-scroll" style="padding:16px 20px;">
+            <div class="sl" style="margin-bottom:10px;">Configurações</div>
+            <div style="padding:14px 0;border-bottom:1px solid #d8bfa0;display:flex;justify-content:space-between;align-items:center;cursor:pointer"><div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:32px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">👤</div><span style="font-size:14px;font-weight:500">Editar perfil</span></div><span style="color:var(--mu);font-size:18px;">›</span></div>
+            <div style="padding:14px 0;border-bottom:1px solid #d8bfa0;display:flex;justify-content:space-between;align-items:center;cursor:pointer"><div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:32px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🔑</div><span style="font-size:14px;font-weight:500">Alterar senha</span></div><span style="color:var(--mu);font-size:18px;">›</span></div>
+            <div style="padding:14px 0;border-bottom:1px solid #d8bfa0;display:flex;justify-content:space-between;align-items:center;cursor:pointer"><div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:32px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🔔</div><span style="font-size:14px;font-weight:500">Notificações</span></div><span style="color:var(--mu);font-size:18px;">›</span></div>
+            <div style="padding:14px 0;cursor:pointer" onclick="goTo('t01')"><div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:32px;background:#FCEBEB;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🚪</div><span style="font-size:14px;font-weight:700;color:#E24B4A">Sair da conta</span></div></div>
+        </div>
+        <div class="nb">
+            <div class="ni" onclick="goTo('t04')"><span class="icon">🏠</span><span class="nt">Início</span></div>
+            <div class="ni" onclick="goTo('t06')"><span class="icon">📋</span><span class="nt">Doações</span></div>
+            <div class="ni" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt">Chat</span></div>
+            <div class="ni" onclick="goTo('t09')"><span class="icon">📊</span><span class="nt">Histórico</span></div>
+            <div class="ni on" onclick="goTo('t10')"><span class="icon">👤</span><span class="nt on">Perfil</span></div>
+        </div>
+    </div>
+
+    <div id="t11" class="screen">
+        <div style="background:var(--g1);padding:20px 16px 20px;border-bottom-left-radius:20px;border-bottom-right-radius:20px;">
+            <div class="ht" style="font-size:18px;">Olá, Maria 👋</div>
+            <div class="hs" style="font-size:12px;">Fortaleza — 12 doações próximas</div>
+            <div style="margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px">
+                <span style="font-size:14px;color:var(--g1)">🔍</span>
+                <input style="border:none;background:transparent;outline:none;font-size:13px;width:100%;color:var(--txt);" placeholder="Buscar doações, itens..."/>
+            </div>
+        </div>
+        <div class="content-scroll" style="padding:16px;gap:12px;">
+            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;">
+                <span class="pill-o" style="font-size:12px;padding:6px 14px;">Todos</span>
+                <span style="font-size:12px;padding:6px 14px;border-radius:20px;background:#fff;color:var(--mu);font-weight:600;border:1px solid #d8bfa0;cursor:pointer;" onclick="goTo('t12')">Filtrar ⚙️</span>
+                <span style="font-size:12px;padding:6px 14px;border-radius:20px;background:#fff;color:var(--mu);font-weight:600;border:1px solid #d8bfa0;cursor:pointer;">Prontos</span>
+            </div>
+            
+            <div class="ci" style="padding:0;overflow:hidden;cursor:pointer;" onclick="goTo('t08')">
+                <div style="height:70px;background:#C0DD97;display:flex;align-items:center;justify-content:center;font-size:35px">🥗</div>
+                <div style="padding:12px 14px">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:14px;font-weight:700">Marmitas prontas</span><span class="tgg">disponível</span></div>
+                    <div class="mu" style="margin-top:4px;">Rest. Sol Nascente</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+                        <span class="mu" style="font-weight:600;color:var(--g1)">📍 1,2 km · 10 unid.</span>
+                        <button style="background:var(--o1);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer">Solicitar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ci" style="padding:0;overflow:hidden">
+                <div style="height:70px;background:#FAC775;display:flex;align-items:center;justify-content:center;font-size:35px">🌾</div>
+                <div style="padding:12px 14px">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:14px;font-weight:700">Arroz e feijão</span><span class="tgo">último dia</span></div>
+                    <div class="mu" style="margin-top:4px;">Supermercado Bom Preço</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+                        <span class="mu" style="font-weight:600;color:var(--o1)">📍 2,8 km · 5 kg</span>
+                        <button style="background:var(--o1);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer">Solicitar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nb">
+            <div class="ni on" onclick="goTo('t11')"><span class="icon">🏠</span><span class="nt on">Início</span></div>
+            <div class="ni"><span class="icon">🗺️</span><span class="nt">Mapa</span></div>
+            <div class="ni"><span class="icon">📦</span><span class="nt">Pedidos</span></div>
+            <div class="ni" onclick="goTo('t08')"><span class="icon">💬</span><span class="nt">Chat</span></div>
+            <div class="ni" onclick="goTo('t01')"><span class="icon">🚪</span><span class="nt">Sair</span></div>
+        </div>
+    </div>
+
+    <div id="t12" class="screen">
+        <div class="hdr-g"><div class="hb" onclick="goTo('t11')"><span style="color:#fff;font-size:18px">←</span><span class="ht">Filtrar doações</span></div></div>
+        <div class="content-scroll" style="padding:16px;gap:16px;">
+            <div>
+                <div class="sl">Distância Máxima</div>
+                <input type="range" min="1" max="20" value="5" style="width:100%; accent-color: var(--o1); margin-top:8px;">
+                <div style="text-align:center; font-size:12px; font-weight:700; color:var(--o1); margin-top:4px;">Até 5 km</div>
+            </div>
+            <div>
+                <div class="sl">Tipo de Alimento</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" checked accent-color="var(--g1)"> Prontos para consumo</label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" checked accent-color="var(--g1)"> Perecíveis</label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px;"><input type="checkbox" accent-color="var(--g1)"> Grãos e Cereais</label>
+                </div>
+            </div>
+            <button class="btn-o" onclick="goTo('t11')" style="margin-top:auto;">Aplicar Filtros</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function goTo(screenId) {
+        document.querySelectorAll('.screen').forEach(el => {
+            el.classList.remove('active');
+        });
+        const target = document.getElementById(screenId);
+        if (target) {
+            target.classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>
