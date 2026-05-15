@@ -4,19 +4,23 @@ import {
   SafeAreaView, StatusBar, ScrollView, Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
 
 // ── Componente de Requisito ──────────────────────────────────────────
-const Requisito = ({ texto, validado }) => (
+// Recebendo theme e styles como props para aplicar as cores dinâmicas
+const Requisito = ({ texto, validado, theme, styles }) => (
   <View style={styles.infoRow}>
-    <View style={[styles.infoIcone, validado && { backgroundColor: '#006B14' }]}>
+    <View style={[styles.infoIcone, validado && { backgroundColor: theme.primary }]}>
       <MaterialCommunityIcons
         name={validado ? 'check' : 'minus'}
         size={12}
-        color={validado ? '#FFFFFF' : '#888888'}
+        color={validado ? theme.buttonTextInverse : theme.textMuted}
       />
     </View>
-    <Text style={[styles.infoValor, validado && { color: '#006B14', fontWeight: '600' }]}>
+    <Text style={[styles.infoValor, validado && { color: theme.primary, fontWeight: '600' }]}>
       {texto}
     </Text>
   </View>
@@ -29,6 +33,11 @@ export default function T04_RecuperarSenha({ navigation }) {
   const [confirma, setConfirma] = useState('');
   const [verSenha, setVerSenha] = useState(false);
   const [verConfirma, setVerConfirma] = useState(false);
+
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
 
   const temOito       = senha.length >= 8;
   const temMaiuscula  = /[A-Z]/.test(senha);
@@ -55,15 +64,20 @@ export default function T04_RecuperarSenha({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, { height: 70, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', paddingTop: Platform.OS === 'android' ? 12 : 8 }]}>
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => (etapa === 2 ? setEtapa(1) : navigation.goBack())}
+          activeOpacity={0.8}
         >
-          <MaterialCommunityIcons name="arrow-left" size={22} color="#FFFFFF" />
+          <MaterialCommunityIcons name="arrow-left" size={22} color={theme.headerTextInverse} />
         </TouchableOpacity>
         <Text style={[styles.saudacao, { fontSize: 18, paddingBottom: 0 }]}>Recuperar senha</Text>
         <View style={{ width: 38 }} />
@@ -72,25 +86,25 @@ export default function T04_RecuperarSenha({ navigation }) {
       {/* Steps */}
       <View style={{
         flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#FFFFFF', paddingVertical: 16, paddingHorizontal: 40,
-        borderBottomWidth: 1, borderBottomColor: '#DDDDDD',
+        backgroundColor: theme.cardBackground, paddingVertical: 16, paddingHorizontal: 40,
+        borderBottomWidth: 1, borderBottomColor: theme.gray,
       }}>
         {/* Step 1 */}
         <View style={{ alignItems: 'center' }}>
-          <View style={[styles.infoIcone, etapa >= 1 && { backgroundColor: '#006B14', width: 32, height: 32, borderRadius: 16 }]}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: etapa >= 1 ? '#FFFFFF' : '#888888' }}>1</Text>
+          <View style={[styles.infoIcone, etapa >= 1 && { backgroundColor: theme.primary, width: 32, height: 32, borderRadius: 16 }]}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: etapa >= 1 ? theme.buttonTextInverse : theme.textMuted }}>1</Text>
           </View>
-          <Text style={[styles.infoLabel, etapa >= 1 && { color: '#DA4A02' }]}>E-mail</Text>
+          <Text style={[styles.infoLabel, etapa >= 1 && { color: theme.secondary }]}>E-mail</Text>
         </View>
 
-        <View style={{ flex: 1, height: 2, backgroundColor: etapa === 2 ? '#006B14' : '#DDDDDD', marginHorizontal: 10 }} />
+        <View style={{ flex: 1, height: 2, backgroundColor: etapa === 2 ? theme.primary : theme.gray, marginHorizontal: 10 }} />
 
         {/* Step 2 */}
         <View style={{ alignItems: 'center' }}>
-          <View style={[styles.infoIcone, etapa === 2 && { backgroundColor: '#006B14', width: 32, height: 32, borderRadius: 16 }]}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: etapa === 2 ? '#FFFFFF' : '#888888' }}>2</Text>
+          <View style={[styles.infoIcone, etapa === 2 && { backgroundColor: theme.primary, width: 32, height: 32, borderRadius: 16 }]}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: etapa === 2 ? theme.buttonTextInverse : theme.textMuted }}>2</Text>
           </View>
-          <Text style={[styles.infoLabel, etapa === 2 && { color: '#DA4A02' }]}>Nova senha</Text>
+          <Text style={[styles.infoLabel, etapa === 2 && { color: theme.secondary }]}>Nova senha</Text>
         </View>
       </View>
 
@@ -102,10 +116,11 @@ export default function T04_RecuperarSenha({ navigation }) {
 
             <Text style={styles.labelCadastro}>E-mail</Text>
             <View style={styles.inputCadastroIcone}>
-              <MaterialCommunityIcons name="email-outline" size={20} color="#888888" style={{ marginRight: 10 }} />
+              <MaterialCommunityIcons name="email-outline" size={20} color={theme.textMuted} style={{ marginRight: 10 }} />
               <TextInput
                 style={styles.inputSemBorda}
                 placeholder="seu@email.com"
+                placeholderTextColor={theme.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -114,8 +129,9 @@ export default function T04_RecuperarSenha({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={[styles.botao_entrar, !email.includes('@') && { backgroundColor: '#CCC', elevation: 0 }]}
+              style={[styles.botao_entrar, !email.includes('@') && { backgroundColor: theme.gray, elevation: 0 }]}
               onPress={handleEnviarEmail}
+              activeOpacity={0.8}
             >
               <Text style={styles.texto_botao_entrar}>Enviar link</Text>
             </TouchableOpacity>
@@ -132,36 +148,39 @@ export default function T04_RecuperarSenha({ navigation }) {
                 value={senha}
                 onChangeText={setSenha}
                 placeholder="Digite a nova senha"
+                placeholderTextColor={theme.textMuted}
               />
-              <TouchableOpacity onPress={() => setVerSenha(!verSenha)}>
-                <MaterialCommunityIcons name={verSenha ? 'eye-off' : 'eye'} size={20} color="#888888" />
+              <TouchableOpacity onPress={() => setVerSenha(!verSenha)} activeOpacity={0.7}>
+                <MaterialCommunityIcons name={verSenha ? 'eye-off' : 'eye'} size={20} color={theme.textMuted} />
               </TouchableOpacity>
             </View>
 
-            {/* Requisitos */}
-            <View style={{ backgroundColor: '#E8F5E9', borderRadius: 12, padding: 14, marginBottom: 20 }}>
-              <Requisito texto="Mínimo 8 caracteres" validado={temOito} />
-              <Requisito texto="Uma letra maiúscula" validado={temMaiuscula} />
-              <Requisito texto="Número ou símbolo"   validado={temNumOuSim} />
+            {/* Requisitos (O Fundo reage ao Dark Mode usando badgeAtivaBg) */}
+            <View style={{ backgroundColor: theme.badgeAtivaBg, borderRadius: 12, padding: 14, marginBottom: 20 }}>
+              <Requisito texto="Mínimo 8 caracteres" validado={temOito} theme={theme} styles={styles} />
+              <Requisito texto="Uma letra maiúscula" validado={temMaiuscula} theme={theme} styles={styles} />
+              <Requisito texto="Número ou símbolo"   validado={temNumOuSim} theme={theme} styles={styles} />
             </View>
 
             <Text style={styles.labelCadastro}>Confirmar Senha</Text>
-            <View style={[styles.inputCadastroIcone, confirma && !senhasIguais && { borderColor: '#DA4A02' }]}>
+            <View style={[styles.inputCadastroIcone, confirma && !senhasIguais && { borderColor: theme.secondary }]}>
               <TextInput
                 style={styles.inputSemBorda}
                 secureTextEntry={!verConfirma}
                 value={confirma}
                 onChangeText={setConfirma}
                 placeholder="Confirme a nova senha"
+                placeholderTextColor={theme.textMuted}
               />
-              <TouchableOpacity onPress={() => setVerConfirma(!verConfirma)}>
-                <MaterialCommunityIcons name={verConfirma ? 'eye-off' : 'eye'} size={20} color="#888888" />
+              <TouchableOpacity onPress={() => setVerConfirma(!verConfirma)} activeOpacity={0.7}>
+                <MaterialCommunityIcons name={verConfirma ? 'eye-off' : 'eye'} size={20} color={theme.textMuted} />
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.botao_entrar, (!senhaValida || !senhasIguais) && { backgroundColor: '#CCC', elevation: 0 }]}
+              style={[styles.botao_entrar, (!senhaValida || !senhasIguais) && { backgroundColor: theme.gray, elevation: 0 }]}
               onPress={handleSalvarSenha}
+              activeOpacity={0.8}
             >
               <Text style={styles.texto_botao_entrar}>Salvar Nova Senha</Text>
             </TouchableOpacity>
