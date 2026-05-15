@@ -3,22 +3,35 @@ import {
   View, Text, TouchableOpacity, ScrollView,
   SafeAreaView, StatusBar,
 } from 'react-native';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterDoador from './FooterDoador';
 
 export default function T07_MinhasDoacoes({ navigation }) {
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, { height: 130 }]}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Text style={styles.menuIconeTexto}>←</Text>
           </TouchableOpacity>
           <Text style={styles.saudacao}>Minhas Doações</Text>
-          <TouchableOpacity style={styles.menuIcone}>
+          <TouchableOpacity style={styles.menuIcone} activeOpacity={0.7}>
             <Text style={styles.menuIconeTexto}>≡</Text>
           </TouchableOpacity>
         </View>
@@ -31,13 +44,17 @@ export default function T07_MinhasDoacoes({ navigation }) {
       >
         {/* Filtros */}
         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
-          <TouchableOpacity style={[styles.badgePendente, { backgroundColor: '#006B14' }]}>
-            <Text style={{ color: '#FFF', fontWeight: 'bold' }}>Todos</Text>
+          {/* Hexadecimais isolados substituídos pelo Theme */}
+          <TouchableOpacity 
+            style={[styles.badgePendente, { backgroundColor: theme.primary }]} 
+            activeOpacity={0.8}
+          >
+            <Text style={{ color: theme.buttonTextInverse, fontWeight: 'bold' }}>Todos</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.badgePendente}>
+          <TouchableOpacity style={styles.badgePendente} activeOpacity={0.8}>
             <Text style={styles.badgePendenteTexto}>Concluídos</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.badgePendente}>
+          <TouchableOpacity style={styles.badgePendente} activeOpacity={0.8}>
             <Text style={styles.badgePendenteTexto}>Pendentes</Text>
           </TouchableOpacity>
         </View>
@@ -55,6 +72,7 @@ export default function T07_MinhasDoacoes({ navigation }) {
           <TouchableOpacity
             style={[styles.botaoAceitar, { alignSelf: 'flex-end', paddingHorizontal: 20 }]}
             onPress={() => navigation.navigate('DetalheDoacaoDoador')}
+            activeOpacity={0.8}
           >
             <Text style={styles.botaoAceitarTexto}>ver →</Text>
           </TouchableOpacity>
