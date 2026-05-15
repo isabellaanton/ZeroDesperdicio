@@ -1,8 +1,16 @@
 import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
-import { styles } from '../../Styles'; // Ajuste o caminho do seu arquivo de estilos
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
 
 export default function FooterDoador({ navigation, abaAtual }) {
+  // 2. Consumindo o tema atual
+  const { theme } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
+
   return (
     <View style={styles.navBar}>
       <TouchableOpacity style={styles.navItem} onPress={() => navigation?.navigate('HomeDoador')} activeOpacity={0.7}>
