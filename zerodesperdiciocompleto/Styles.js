@@ -1,33 +1,21 @@
 import { StyleSheet, Platform, Dimensions } from 'react-native';
 
-
-// PALETA DE CORES UNIFICADA (ZeroDesperdício)
-const VERDE_ESCURO = '#006B14';
-const LARANJA = '#DA4A02';
-const FUNDO = '#FFDDAE';
-const BEGE_CARD = '#FFD2AE';
-const TEXTO_ESCURO = '#1A1A1A';
-const TEXTO_MEDIO = '#555555';
-const TEXTO_CLARO = '#888888';
-const BRANCO = '#FFFFFF';
-const PRETO = '#000000';
-
-export const styles = StyleSheet.create({
+export const getGlobalStyles = (theme) => StyleSheet.create({
   // --- ESTRUTURAS GERAIS --- //
   container: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 25,
     paddingTop: 40,
-    backgroundColor: FUNDO,
+    backgroundColor: theme.background,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: FUNDO,
+    backgroundColor: theme.background,
   },
   conteudo: {
     flex: 1,
-    backgroundColor: FUNDO,
+    backgroundColor: theme.background,
   },
   conteudoContainer: {
     paddingHorizontal: 20,
@@ -40,62 +28,50 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: FUNDO, // Mesmo fundo da Home
+    backgroundColor: theme.background,
   },
-
-  // Estilo de texto principal (similar ao 'saudacao' da Home)
   texto2: {
     fontSize: 18,
-    color: VERDE_ESCURO,
+    color: theme.primary,
     fontWeight: '700',
     marginHorizontal: 40,
     marginBottom: 20,
   },
-
-  // Estilo dos tópicos (similar ao 'descricaoSolicitacao' da Home)
   texto3: {
     fontSize: 15,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     lineHeight: 24,
     marginBottom: 40,
     paddingLeft: 60,
     paddingRight: 60,
     paddingHorizontal: 30,
   },
-
   imagem: {
     marginBottom: 30,
     width: 300,
     height: 200,
     resizeMode: 'contain',
   },
-
-  // Botão Entrar (Igual ao 'botaoNovaDoacao' da Home)
-
   texto_botao: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontSize: 17,
     fontWeight: '700',
   },
-
-  // Botão Criar Conta (Igual ao 'botaoRecusar' da Home)
   botao2: {
-    backgroundColor: BRANCO,
+    backgroundColor: theme.background,
     width: '80%',
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
   },
-
   texto_botao2: {
-    color: LARANJA,
+    color: theme.secondary,
     fontSize: 17,
     fontWeight: '700',
   },
-
 
   // --- TEXTOS E TÍTULOS (Login/Cadastro/Redefinir) //
   title: {
@@ -103,23 +79,23 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: VERDE_ESCURO,
+    color: theme.primary,
   },
   subtitle: {
     fontSize: 15,
     textAlign: 'center',
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
     marginBottom: 15,
   },
   texto_bem_vindo: {
-    color: VERDE_ESCURO,
+    color: theme.primary,
     fontWeight: 'bold',
     fontSize: 28,
     textAlign: 'center',
     marginTop: 40,
   },
   texto_acesso_conta: {
-    color: TEXTO_CLARO,
+    color: theme.textMuted,
     fontSize: 15,
     textAlign: 'center',
     marginTop: 10,
@@ -128,22 +104,23 @@ export const styles = StyleSheet.create({
 
   // --- INPUTS PADRONIZADOS ---
   input: {
-    backgroundColor: BRANCO,
+    backgroundColor: theme.inputBackground,
     borderWidth: 1.5,
-    borderColor: TEXTO_MEDIO,
+    borderColor: theme.textSecondary,
     borderRadius: 15,
     paddingHorizontal: 20,
     height: 55,
     width: '95%',
     alignSelf: 'center',
     marginTop: 15,
+    color: theme.textPrimary,
   },
-  inputContainer: { // Para telas com ícone de olho
+  inputContainer: { 
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: BRANCO,
+    backgroundColor: theme.inputBackground,
     borderWidth: 1.5,
-    borderColor: TEXTO_MEDIO,
+    borderColor: theme.textSecondary,
     borderRadius: 15,
     paddingHorizontal: 15,
     height: 55,
@@ -153,8 +130,8 @@ export const styles = StyleSheet.create({
   },
 
   // --- BOTÕES ---
-  botao_entrar: { // Usado no Login e Redefinir
-    backgroundColor: LARANJA,
+  botao_entrar: { 
+    backgroundColor: theme.secondary,
     height: 55,
     borderRadius: 15,
     justifyContent: 'center',
@@ -164,20 +141,20 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     elevation: 3,
   },
-  buttonPrimary: { // Alias para o botão padrão
-    backgroundColor: LARANJA,
+  buttonPrimary: { 
+    backgroundColor: theme.secondary,
     padding: 15,
     borderRadius: 10,
     marginTop: 10,
     alignItems: 'center',
   },
   buttonText: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontWeight: 'bold',
     fontSize: 18,
   },
   texto_botao_entrar: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -192,22 +169,20 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     borderWidth: 1.5,
-    borderColor: TEXTO_CLARO,
+    borderColor: theme.textMuted,
     borderRadius: 10,
     alignItems: "center",
     marginHorizontal: 5,
-    backgroundColor: BRANCO
+    backgroundColor: theme.inputBackground
   },
   tipoSelecionado: {
-    borderColor: VERDE_ESCURO,
-    backgroundColor: '#C8F7C5'
+    borderColor: theme.primary,
+    backgroundColor: theme.badgeAtivaBg,
   },
 
   // --- COMPONENTES ESPECÍFICOS (Home Doador) ---
-
-  // Header
   header: {
-    backgroundColor: VERDE_ESCURO,
+    backgroundColor: theme.headerBackground,
     paddingHorizontal: 20,
     paddingBottom: 14,
     flexDirection: 'column', 
@@ -222,16 +197,15 @@ export const styles = StyleSheet.create({
     width: '95%',
   },
   saudacao: {
-  fontSize: 25,
-  fontWeight: '700',
-  color: BRANCO,
-  letterSpacing: 0.2,
-  paddingBottom: 25, 
-},
-
+    fontSize: 25,
+    fontWeight: '700',
+    color: theme.headerTextInverse,
+    letterSpacing: 0.2,
+    paddingBottom: 25, 
+  },
   nomeRestaurante: {
     fontSize: 16,
-    color: 'rgba(255,255,255,0.75)',
+    color: theme.headerTextInverse,
     paddingBottom: 5,
   },
   menuIcone: {
@@ -239,7 +213,7 @@ export const styles = StyleSheet.create({
   },
   menuIconeTexto: {
     fontSize: 35,
-    color: BRANCO,
+    color: theme.headerTextInverse,
   },
 
   // Cards de resumo
@@ -249,59 +223,53 @@ export const styles = StyleSheet.create({
   },
   resumoCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: theme.mode === 'dark' ? theme.cardBackground : 'rgba(255,255,255,0.3)',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     alignItems: 'center',
   },
   resumoCardDestaque: {
-    backgroundColor: LARANJA,
+    backgroundColor: theme.secondary,
   },
   resumoNumero: {
     fontSize: 28,
     fontWeight: '700',
-    color: TEXTO_MEDIO,
+    color: theme.textPrimary,
     alignItems: 'center',
-
   },
   resumoLabel: {
     fontSize: 13,
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
     marginTop: 2,
     alignItems: 'center',
   },
   resumoNumeroDestaque: {
     fontSize: 28,
     fontWeight: '700',
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     alignItems: 'center',
-
   },
   resumoLabelDestaque: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
+    color: theme.mode === 'dark' ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.85)',
     marginTop: 2,
     alignItems: 'center',
-
   },
 
   // Conteúdo
   conteudoHomeDoador: {
-  flex: 1,
-  backgroundColor: FUNDO,
-  marginTop: -1,
-},
+    flex: 1,
+    backgroundColor: theme.background,
+    marginTop: -1,
+  },
   conteudoContainerHomeDoador: {
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 20,
-    
   },
-
-  // Botão Nova Doação
   botaoNovaDoacao: {
-    backgroundColor: LARANJA,
+    backgroundColor: theme.secondary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -311,27 +279,23 @@ export const styles = StyleSheet.create({
   botaoNovaDoacaoTexto: {
     fontSize: 17,
     fontWeight: '700',
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     letterSpacing: 0.3,
   },
-
-  // Seção título
   secaoTitulo: {
     fontSize: 11,
     fontWeight: '700',
-    color: TEXTO_CLARO,
+    color: theme.textMuted,
     letterSpacing: 1.2,
     marginBottom: 12,
   },
-
-  // Card de solicitação
   cardSolicitacao: {
-    backgroundColor: BEGE_CARD,
+    backgroundColor: theme.cardBackground,
     borderRadius: 14,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#DA4A02',
+    borderColor: theme.secondary,
     elevation: 2,
   },
   cardHeader: {
@@ -343,39 +307,35 @@ export const styles = StyleSheet.create({
   nomeOng: {
     fontSize: 15,
     fontWeight: '700',
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     flex: 1,
     marginRight: 8,
   },
   descricaoSolicitacao: {
     fontSize: 13,
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
     marginBottom: 14,
   },
-
-  // Badge
   badgePendente: {
-    backgroundColor: '#FDEBD8',
+    backgroundColor: theme.badgeBg,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderWidth: 1,
-    borderColor: '#F0C49A',
+    borderColor: theme.badgeBorder,
   },
   badgePendenteTexto: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#A0511A',
+    color: theme.badgeText,
   },
-
-  // Botões do card
   botoesCard: {
     flexDirection: 'row',
     gap: 10,
   },
   botaoAceitar: {
     flex: 1,
-    backgroundColor: VERDE_ESCURO,
+    backgroundColor: theme.primary,
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center',
@@ -383,39 +343,37 @@ export const styles = StyleSheet.create({
   botaoAceitarTexto: {
     fontSize: 14,
     fontWeight: '600',
-    color: BRANCO,
+    color: theme.buttonTextInverse,
   },
   botaoRecusar: {
     flex: 1,
-    backgroundColor: FUNDO,
+    backgroundColor: theme.background,
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
   },
   botaoRecusarTexto: {
     fontSize: 14,
     fontWeight: '600',
-    color: LARANJA,
+    color: theme.secondary,
   },
-
-  // Empty state
   emptyState: {
     paddingVertical: 40,
     alignItems: 'center',
   },
   emptyStateTexto: {
     fontSize: 14,
-    color: TEXTO_CLARO,
+    color: theme.textMuted,
   },
 
   // Barra de navegação
   navBar: {
     flexDirection: 'row',
-    backgroundColor: BRANCO,
+    backgroundColor: theme.cardBackground,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.08)',
+    borderTopColor: theme.badgeBorder,
     paddingBottom: 30,
     paddingHorizontal: 8,
   },
@@ -429,24 +387,25 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 2,
     opacity: 0.5,
+    color: theme.textPrimary,
   },
   navIconeAtivo: {
     fontSize: 20,
     marginBottom: 2,
-    color: VERDE_ESCURO,
+    color: theme.primary,
   },
   navLabel: {
     fontSize: 10,
-    color: TEXTO_CLARO,
+    color: theme.textMuted,
     fontWeight: '500',
   },
   navLabelAtivo: {
     fontSize: 10,
-    color: VERDE_ESCURO,
+    color: theme.primary,
     fontWeight: '700',
   },
-backBtn: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
+  backBtn: {
+    backgroundColor: theme.backBtnBg,
     borderRadius: 18,
     width: 36,
     height: 36,
@@ -454,7 +413,7 @@ backBtn: {
     justifyContent: 'center',
   },
   backBtnTexto: {
-    color: BRANCO,
+    color: theme.headerTextInverse,
     fontSize: 18,
     fontWeight: '700',
     alignItems: 'center',
@@ -463,7 +422,7 @@ backBtn: {
   headerTitulo: {
     fontSize: 11,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.75)',
+    color: theme.headerTextInverse,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
     alignItems: 'center',
@@ -487,8 +446,6 @@ backBtn: {
   avatarEmoji: {
     fontSize: 30,
   },
- 
-  // Stats
   statsRow: {
     flexDirection: 'row',
     gap: 10,
@@ -496,28 +453,24 @@ backBtn: {
     marginTop: 5,
     marginBottom: 4,
   },
- 
-  // Scroll
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
   },
- 
-  // Info rows dentro do card
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: TEXTO_CLARO,
+    borderBottomColor: theme.textMuted,
   },
   infoIcone: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(0,107,20,0.10)',
+    backgroundColor: theme.iconBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -526,26 +479,22 @@ backBtn: {
   },
   infoLabel: {
     fontSize: 11,
-    color: TEXTO_CLARO,
+    color: theme.textMuted,
     fontWeight: '600',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   infoValor: {
     fontSize: 14,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     fontWeight: '500',
     marginTop: 2,
   },
- 
-  // Sobre
   sobreRow: {
     flexDirection: 'row',
     gap: 12,
     alignItems: 'flex-start',
   },
- 
-  // Card doação
   doacaoCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -555,42 +504,39 @@ backBtn: {
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: 'rgba(0,107,20,0.12)',
+    backgroundColor: theme.iconBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
- 
-  // Badge ativa
   badgeAtiva: {
-    backgroundColor: '#D4EDDA',
-    borderColor: '#A8D5B5',
+    backgroundColor: theme.badgeAtivaBg,
+    borderColor: theme.badgeAtivaBorder,
   },
   badgeAtivaTexto: {
-    color: '#1A6E35',
+    color: theme.badgeAtivaText,
   },
-
-cardSelecionado: {
+  cardSelecionado: {
     position: 'absolute',
     bottom: 12, left: 16, right: 16,
-    backgroundColor: BEGE_CARD,
+    backgroundColor: theme.cardBackground,
     borderRadius: 18,
     padding: 16,
     borderWidth: 1.5,
-    borderColor: 'rgba(218,74,2,0.3)',
+    borderColor: theme.secondary,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 10,
   },
   cardLabel: {
     fontSize: 10, fontWeight: '700',
-    color: LARANJA, letterSpacing: 1,
+    color: theme.secondary, letterSpacing: 1,
     textTransform: 'uppercase', marginBottom: 4,
   },
   cardNome: {
     fontSize: 22, fontWeight: '700',
-    color: TEXTO_ESCURO, marginBottom: 8, lineHeight: 26,
+    color: theme.textPrimary, marginBottom: 8, lineHeight: 26,
   },
   cardInfoRow: {
     flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2,
@@ -600,16 +546,15 @@ cardSelecionado: {
   },
 
   //T10//
-
-    content: {
+  content: {
     padding: 20,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#F9D1A5',
+    backgroundColor: theme.cardBackground,
     borderWidth: 1,
-    borderColor: '#D35400',
+    borderColor: theme.secondary,
     borderRadius: 10,
     paddingVertical: 15,
     marginBottom: 25,
@@ -620,16 +565,17 @@ cardSelecionado: {
   statNumber: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: theme.textPrimary,
   },
   statLabel: {
     fontSize: 12,
-    color: '#333',
+    color: theme.textSecondary,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#F9D1A5',
+    backgroundColor: theme.cardBackground,
     borderWidth: 1,
-    borderColor: '#D35400',
+    borderColor: theme.secondary,
     borderRadius: 10,
     padding: 10,
     marginBottom: 15,
@@ -641,146 +587,133 @@ cardSelecionado: {
     justifyContent: 'center',
   },
   statusButton: {
-    backgroundColor: '#1CB800',
+    backgroundColor: theme.primary,
     borderRadius: 15,
     paddingVertical: 5,
     alignItems: 'center',
   },
   statusText: {
-    color: 'white',
+    color: theme.buttonTextInverse,
     fontWeight: 'bold',
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#FDE3B7',
+    backgroundColor: theme.cardBackground,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#CCC',
+    borderTopColor: theme.badgeBorder,
   },
   tabItem: {
     alignItems: 'center',
   },
   tabText: {
     fontSize: 10,
+    color: theme.textPrimary,
   },
 
-//T11//
-    menuIcon: {
+  //T11//
+  menuIcon: {
     position: 'absolute',
     right: 20,
     top: 20,
   },
-
   name: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.textPrimary,
     marginTop: 10,
   },
-
   stat: {
     alignItems: 'center',
     marginHorizontal: 20,
   },
-
   menu: {
     marginTop: 20,
     paddingHorizontal: 20,
   },
-
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#999',
+    borderBottomColor: theme.badgeBorder,
   },
-
   menuText: {
     marginLeft: 15,
     fontSize: 16,
+    color: theme.textPrimary,
   },
-
   deleteText: {
     textAlign: 'center',
-    color: 'red',
+    color: theme.secondary,
     marginTop: 10,
   },
-
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#E7C79E',
+    backgroundColor: theme.cardBackground,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#999',
+    borderTopColor: theme.badgeBorder,
     marginTop: 'auto',
   },
-
   navText: {
     fontSize: 12,
+    color: theme.textPrimary,
   },
 
-//T13 e T14//
-tag: {
-    backgroundColor: BEGE_CARD,
+  //T13 e T14//
+  tag: {
+    backgroundColor: theme.cardBackground,
     padding: 6,
     borderRadius: 8,
     marginRight: 5,
     marginBottom: 5,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
   },
-
   titulo: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: VERDE_ESCURO,
+    color: theme.primary,
   },
-
   label: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     marginTop: 10,
     marginBottom: 5,
   },
-  
   label_input: {
-    backgroundColor: BRANCO,
+    backgroundColor: theme.inputBackground,
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,
-    color: 'gray',
+    color: theme.gray,
   },
-
   linha: {
     flexDirection: 'row',
     display: 'flex',
     flexWrap: 'wrap',
     padding: 10,
     marginBottom: 10,
-    backgroundColor: '#ebdbc4',
+    backgroundColor: theme.inputBackground,
     borderRadius: 10,
     borderWidth: 3,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
   },
-
   nome: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: VERDE_ESCURO,
+    color: theme.primary,
   },
-
   disponivel: {
-    color: VERDE_ESCURO,
+    color: theme.primary,
     marginBottom: 10,
   },
-
   textoCard: {
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
   },
-  
   container_icone_voltar_contato: {
     width: '100%',
     alignItems: 'center',
@@ -789,9 +722,10 @@ tag: {
     flexWrap: 'wrap',
     marginBottom: 10,
   },
-//Componentes específicos (T06_CadastrarDoacao)'
+
+  // Componentes específicos (T06_CadastrarDoacao)
   header_cadastro: {
-    backgroundColor: VERDE_ESCURO,
+    backgroundColor: theme.headerBackground,
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'android' ? 16 : 8,
     paddingBottom: 30,
@@ -809,7 +743,7 @@ tag: {
   tituloCadastro: {
     fontSize: 24,
     fontWeight: '700',
-    color: BRANCO,
+    color: theme.headerTextInverse,
   },
   menuIconeAbsoluto: {
     position: 'absolute',
@@ -824,18 +758,18 @@ tag: {
   },
   labelCadastro: {
     fontSize: 16,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     marginBottom: 8,
     marginTop: 15,
   },
   inputCadastro: {
-    backgroundColor: '#E8D4BE', // Fundo bege igual ao do protótipo
+    backgroundColor: theme.inputBackground,
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 15,
     paddingHorizontal: 15,
     height: 55,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     fontSize: 16,
   },
   rowCadastro: {
@@ -845,6 +779,7 @@ tag: {
   inputMetade: {
     flex: 1,
     textAlign: 'center',
+    color: theme.textPrimary,
   },
   espacoEntreInputs: {
     width: 15,
@@ -852,22 +787,22 @@ tag: {
   inputCadastroIcone: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8D4BE',
+    backgroundColor: theme.inputBackground,
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 15,
     paddingHorizontal: 15,
     height: 55,
   },
   inputSemBorda: {
     flex: 1,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     fontSize: 16,
   },
   inputFoto: {
-    backgroundColor: 'transparent',
+    backgroundColor: theme.transparent,
     borderWidth: 1.5,
-    borderColor: '#A8A8A8',
+    borderColor: theme.textMuted,
     borderStyle: 'dashed',
     borderRadius: 15,
     height: 80,
@@ -876,12 +811,13 @@ tag: {
     marginBottom: 15,
   },
   textoFoto: {
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
     fontSize: 16,
   },
+
   // --- COMPONENTES ESPECÍFICOS (Home Receptor) --- //
   headerReceptor: {
-    backgroundColor: VERDE_ESCURO,
+    backgroundColor: theme.headerBackground,
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'android' ? 25 : 15,
     paddingBottom: 25,
@@ -898,18 +834,19 @@ tag: {
   locationIcone: {
     fontSize: 22,
     marginRight: 5,
+    color: theme.headerTextInverse,
   },
   locationText: {
     fontSize: 22,
     fontWeight: '700',
-    color: BRANCO,
+    color: theme.headerTextInverse,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FDEBD8',
+    backgroundColor: theme.inputBackground,
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 15,
     marginHorizontal: 20,
     marginTop: 20,
@@ -918,13 +855,13 @@ tag: {
   },
   searchIcon: {
     fontSize: 18,
-    color: TEXTO_MEDIO,
+    color: theme.textSecondary,
   },
   searchInput: {
     flex: 1,
     marginLeft: 10,
     fontSize: 16,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
   },
   filtersRow: {
     flexDirection: 'row',
@@ -932,35 +869,35 @@ tag: {
     marginTop: 15,
     marginBottom: 20,
     gap: 10,
-    flexGrow: 1, // Faz o contêiner ocupar a largura total da tela
-    justifyContent: 'center', // Centraliza os itens no meio
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   filterBtn: {
     borderWidth: 1,
-    borderColor: PRETO,
+    borderColor: theme.filtroBorder,
     borderRadius: 8,
     paddingVertical: 4,
     paddingHorizontal: 12,
-    backgroundColor: '#FDEBD8',
+    backgroundColor: theme.inputBackground,
     justifyContent: 'center',
   },
   filterBtnActive: {
-    backgroundColor: VERDE_ESCURO,
-    borderColor: PRETO,
+    backgroundColor: theme.primary,
+    borderColor: theme.primary,
   },
   filterText: {
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     fontSize: 13,
   },
   filterTextActive: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontSize: 13,
   },
   cardReceptor: {
     flexDirection: 'row',
-    backgroundColor: '#FDEBD8',
+    backgroundColor: theme.cardBackground,
     borderWidth: 1.2,
-    borderColor: PRETO,
+    borderColor: theme.filtroBorder,
     borderRadius: 10,
     marginHorizontal: 20,
     marginBottom: 15,
@@ -971,7 +908,7 @@ tag: {
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: '#E0E0E0', 
+    backgroundColor: theme.cardImageBg, 
   },
   cardContent: {
     flex: 1,
@@ -981,7 +918,7 @@ tag: {
   cardTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     marginBottom: 2,
   },
   cardLocationRow: {
@@ -991,27 +928,29 @@ tag: {
   },
   cardDistanceIcon: {
     fontSize: 14,
+    color: theme.secondary,
   },
   cardDistanceText: {
     fontSize: 14,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     marginLeft: 2,
   },
   btnDetalhes: {
-    backgroundColor: LARANJA,
+    backgroundColor: theme.secondary,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 20,
     alignSelf: 'flex-start',
   },
   btnDetalhesText: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontSize: 14,
   },
-    container_contato: {
+
+  container_contato: {
     flex: 1,
     padding: 30,
-    backgroundColor: '#FFE4B5',
+    backgroundColor: theme.cardBackground,
     justifyContent: 'center',
     borderRadius: 40,
   },
@@ -1019,24 +958,25 @@ tag: {
     alignItems: 'center',
     marginBottom: 10,
   },
-texto_contato: {
-    color: '#228B22',
+  texto_contato: {
+    color: theme.verdeContato,
     fontWeight: 'bold',
     fontSize: 24,
     textAlign: 'center',
   },
   subtitulo: {
     textAlign: 'center',
-    color: '#8B7355',
+    color: theme.marromContato,
     marginBottom: 30,
     fontSize: 16,
   },
   input_contato: {
     flex: 1,
     fontSize: 16,
+    color: theme.textPrimary,
   },
   botao: {
-    backgroundColor: '#D34800',
+    backgroundColor: theme.secondary,
     width: '100%',
     height: 55,
     alignItems: 'center',
@@ -1044,7 +984,7 @@ texto_contato: {
     borderRadius: 15,
     marginTop: 10,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
   },
@@ -1052,7 +992,7 @@ texto_contato: {
     marginTop: 30,
   },
   texto_requisito_titulo: {
-    color: '#8B7355',
+    color: theme.marromContato,
     textAlign: 'center',
     marginBottom: 15,
     fontSize: 16,
@@ -1064,48 +1004,46 @@ texto_contato: {
     marginBottom: 5,
   },
   texto_item: {
-    color: '#666',
+    color: theme.textSecondary,
     fontSize: 15,
   },
   footer_texto: {
     marginTop: 40,
     fontSize: 12,
-    color: '#8B7355',
+    color: theme.marromContato,
     textAlign: 'center',
   },
-inputPequeno: {
+  inputPequeno: {
     borderWidth: 2,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 10,
     padding: 10,
     width: 80,
     textAlign: 'center',
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
   },
-
   unidades: {
     borderWidth: 2,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 10,
     padding: 10,
     justifyContent: 'center',
   },
-
   inputGrande: {
     borderWidth: 2,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 10,
     padding: 10,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
   },
-
   textoBotao: {
-    color: BRANCO,
+    color: theme.buttonTextInverse,
     fontWeight: 'bold',
   },
+
   // --- COMPONENTES ESPECÍFICOS (T19_HistoricoReceptor) --- //
   headerHistorico: {
-    backgroundColor: VERDE_ESCURO,
+    backgroundColor: theme.headerBackground,
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'android' ? 25 : 15,
     paddingBottom: 25,
@@ -1121,20 +1059,20 @@ inputPequeno: {
   },
   backIcon: {
     fontSize: 26,
-    color: BRANCO,
+    color: theme.headerTextInverse,
   },
   tituloHistorico: {
     fontSize: 24,
     fontWeight: '700',
-    color: BRANCO,
+    color: theme.headerTextInverse,
     marginLeft: 15,
   },
   cardResumoHistorico: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#FDEBD8', // Bege similar aos cards
+    backgroundColor: theme.cardBackground, 
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 8,
     marginHorizontal: 20,
     marginTop: 25,
@@ -1146,18 +1084,18 @@ inputPequeno: {
   },
   resumoHistoricoValor: {
     fontSize: 26,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
   },
   resumoHistoricoLabel: {
     fontSize: 14,
-    color: TEXTO_ESCURO,
+    color: theme.textPrimary,
     marginTop: 2,
   },
   cardHistorico: {
     flexDirection: 'row',
-    backgroundColor: '#FDEBD8',
+    backgroundColor: theme.cardBackground,
     borderWidth: 1.5,
-    borderColor: LARANJA,
+    borderColor: theme.secondary,
     borderRadius: 8,
     marginHorizontal: 20,
     marginBottom: 15,
@@ -1169,7 +1107,7 @@ inputPequeno: {
     justifyContent: 'center',
   },
   btnConcluido: {
-    backgroundColor: '#0FA918', // Verde mais claro/vibrante conforme protótipo
+    backgroundColor: theme.btnConcluidoBg, 
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 20,
@@ -1177,7 +1115,7 @@ inputPequeno: {
     marginTop: 15,
   },
   btnConcluidoText: {
-    color: BRANCO,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -1190,51 +1128,50 @@ inputPequeno: {
     marginTop: 25,
     marginBottom: 20,
     paddingHorizontal: 20,
+    backgroundColor: theme.transparent,
   },
   filtroBotao: {
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: theme.filtroBorder,
     borderRadius: 6,
     paddingVertical: 4,
     paddingHorizontal: 12,
-    backgroundColor: 'transparent',
+    backgroundColor: theme.transparent,
   },
   filtroBotaoAtivo: {
-    backgroundColor: '#327d35', // Fundo verde para a aba ativa
+    backgroundColor: theme.primary,
   },
   filtroTexto: {
-    color: '#000',
+    color: theme.textPrimary,
     fontSize: 14,
   },
   filtroTextoAtivo: {
-    color: '#FFF',
+    color: theme.buttonTextInverse,
   },
   cardAzul: {
     borderWidth: 2,
-    borderColor: '#2196F3', // Borda azul
+    borderColor: theme.cardAzulBorder,
   },
   cardLaranja: {
     borderWidth: 1,
-    borderColor: '#D85D10', // Borda laranja
+    borderColor: theme.secondary, 
   },
   btnAceito: {
-    backgroundColor: '#1DB954', // Verde claro
+    backgroundColor: theme.btnAceitoBg, 
     borderRadius: 20,
     paddingVertical: 6,
     alignItems: 'center',
     marginRight: 10,
   },
   btnPendente: {
-    backgroundColor: '#A9A9A9', // Cinza
+    backgroundColor: theme.btnPendenteBg, 
     borderRadius: 20,
     paddingVertical: 6,
     alignItems: 'center',
     marginRight: 10,
   },
   btnTextoBranco: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: 14,
   },
 });
-
-export default styles;
