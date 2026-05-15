@@ -3,7 +3,11 @@ import {
   View, Text, TouchableOpacity, ScrollView,
   SafeAreaView, StatusBar, Platform,
 } from 'react-native';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterDoador from './FooterDoador';
 import ResumoPerfil from './ResumoPerfil';
 
@@ -23,7 +27,8 @@ const DOADOR = {
   ],
 };
 
-function InfoRow({ icone, label, valor, ultimo }) {
+// 2. Recebendo styles como prop
+function InfoRow({ icone, label, valor, ultimo, styles }) {
   return (
     <View style={[styles.infoRow, ultimo && { borderBottomWidth: 0, paddingBottom: 0 }]}>
       <View style={styles.infoIcone}>
@@ -37,7 +42,8 @@ function InfoRow({ icone, label, valor, ultimo }) {
   );
 }
 
-function DoacaoCard({ item }) {
+// 2. Recebendo styles como prop
+function DoacaoCard({ item, styles }) {
   const ativa = item.status === 'Ativa';
   return (
     <View style={[styles.cardSolicitacao, styles.doacaoCard]}>
@@ -56,16 +62,25 @@ function DoacaoCard({ item }) {
 }
 
 export default function T09_InfoDoador({ navigation }) {
+  // 3. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 4. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 5. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, {
         height: 70, flexDirection: 'row', alignItems: 'center',
         justifyContent: 'space-between', paddingTop: Platform.OS === 'android' ? 12 : 8,
       }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
           <Text style={styles.backBtnTexto}>←</Text>
         </TouchableOpacity>
         <Text style={[styles.saudacao, { fontSize: 18, paddingBottom: 0 }]}>Info do Doador</Text>
@@ -92,10 +107,11 @@ export default function T09_InfoDoador({ navigation }) {
       >
         <Text style={styles.secaoTitulo}>Informações de contato</Text>
         <View style={styles.cardSolicitacao}>
-          <InfoRow icone="📍" label="Endereço de retirada" valor={DOADOR.endereco} />
-          <InfoRow icone="🕐" label="Horário disponível"   valor={DOADOR.horario} />
-          <InfoRow icone="📱" label="Telefone"             valor={DOADOR.telefone} />
-          <InfoRow icone="✉️" label="E-mail"               valor={DOADOR.email} ultimo />
+          {/* 6. Passando styles como prop para os componentes filhos */}
+          <InfoRow icone="📍" label="Endereço de retirada" valor={DOADOR.endereco} styles={styles} />
+          <InfoRow icone="🕐" label="Horário disponível"   valor={DOADOR.horario} styles={styles} />
+          <InfoRow icone="📱" label="Telefone"             valor={DOADOR.telefone} styles={styles} />
+          <InfoRow icone="✉️" label="E-mail"               valor={DOADOR.email} ultimo styles={styles} />
         </View>
 
         <Text style={styles.secaoTitulo}>Sobre o doador</Text>
@@ -112,7 +128,7 @@ export default function T09_InfoDoador({ navigation }) {
 
         <Text style={styles.secaoTitulo}>Doações disponíveis agora</Text>
         {DOADOR.doacoes_ativas.map((item) => (
-          <DoacaoCard key={item.id} item={item} />
+          <DoacaoCard key={item.id} item={item} styles={styles} />
         ))}
       </ScrollView>
 
