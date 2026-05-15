@@ -3,7 +3,11 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   StatusBar, SafeAreaView, FlatList, Alert,
 } from 'react-native';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterDoador from './FooterDoador';
 
 const solicitacoesIniciais = [
@@ -15,6 +19,11 @@ const solicitacoesIniciais = [
 export default function T05_HomeDoador({ navigation }) {
   const [solicitacoes, setSolicitacoes] = useState(solicitacoesIniciais);
   const [ativas, setAtivas] = useState(3);
+
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
 
   const pendentes = solicitacoes.filter((s) => s.status === 'pendente').length;
 
@@ -73,7 +82,11 @@ export default function T05_HomeDoador({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={styles.header}>
@@ -108,6 +121,7 @@ export default function T05_HomeDoador({ navigation }) {
         <TouchableOpacity
           style={styles.botaoNovaDoacao}
           onPress={() => navigation.navigate('CadastrarDoacao')}
+          activeOpacity={0.8}
         >
           <Text style={styles.botaoNovaDoacaoTexto}>+ Nova doação</Text>
         </TouchableOpacity>
