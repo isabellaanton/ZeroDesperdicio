@@ -4,7 +4,11 @@ import {
   SafeAreaView, StatusBar, TextInput, Alert, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterReceptor from './FooterReceptor';
 
 export default function T16_ConfirmarSolicitacao({ navigation, route }) {
@@ -20,6 +24,11 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
   const [quantidade, setQuantidade] = useState('1');
   const [observacao, setObservacao] = useState('');
   const [enviando, setEnviando] = useState(false);
+
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
 
   const incrementar = () => setQuantidade((q) => String(Math.min(99, Number(q) + 1)));
   const decrementar = () => setQuantidade((q) => String(Math.max(1, Number(q) - 1)));
@@ -38,15 +47,19 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, {
         height: 70, flexDirection: 'row', alignItems: 'center',
         justifyContent: 'space-between', paddingTop: Platform.OS === 'android' ? 12 : 8,
       }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+          <Ionicons name="arrow-back" size={22} color={theme.headerTextInverse} />
         </TouchableOpacity>
         <Text style={[styles.saudacao, { fontSize: 18, paddingBottom: 0 }]}>Confirmar Solicitação</Text>
         <View style={{ width: 38 }} />
@@ -59,8 +72,8 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
         showsVerticalScrollIndicator={false}
       >
         {/* Card resumo */}
-        <View style={[styles.cardSolicitacao, { flexDirection: 'row', alignItems: 'center', gap: 14, borderLeftWidth: 4, borderLeftColor: '#DA4A02' }]}>
-          <View style={[styles.infoIcone, { width: 60, height: 60, borderRadius: 14, backgroundColor: '#FFF3E0' }]}>
+        <View style={[styles.cardSolicitacao, { flexDirection: 'row', alignItems: 'center', gap: 14, borderLeftWidth: 4, borderLeftColor: theme.secondary }]}>
+          <View style={[styles.infoIcone, { width: 60, height: 60, borderRadius: 14, backgroundColor: isDarkMode ? 'rgba(218, 74, 2, 0.15)' : '#FFF3E0' }]}>
             <Text style={{ fontSize: 32 }}>{doacao.icone}</Text>
           </View>
           <View style={{ flex: 1 }}>
@@ -74,21 +87,21 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
         <Text style={styles.secaoTitulo}>DETALHES</Text>
         <View style={styles.cardSolicitacao}>
           <View style={styles.infoRow}>
-            <View style={styles.infoIcone}><Ionicons name="storefront-outline" size={17} color="#006B14" /></View>
+            <View style={styles.infoIcone}><Ionicons name="storefront-outline" size={17} color={theme.primary} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.infoLabel}>Doador</Text>
               <Text style={styles.infoValor}>{doacao.doador}</Text>
             </View>
           </View>
           <View style={styles.infoRow}>
-            <View style={styles.infoIcone}><Ionicons name="location-outline" size={17} color="#006B14" /></View>
+            <View style={styles.infoIcone}><Ionicons name="location-outline" size={17} color={theme.primary} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.infoLabel}>Endereço de retirada</Text>
               <Text style={styles.infoValor}>{doacao.endereco}</Text>
             </View>
           </View>
           <View style={[styles.infoRow, { borderBottomWidth: 0, paddingBottom: 0 }]}>
-            <View style={styles.infoIcone}><Ionicons name="time-outline" size={17} color="#006B14" /></View>
+            <View style={styles.infoIcone}><Ionicons name="time-outline" size={17} color={theme.primary} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.infoLabel}>Disponível até</Text>
               <Text style={styles.infoValor}>{doacao.disponivel}</Text>
@@ -105,8 +118,9 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
               <TouchableOpacity
                 style={[styles.botaoRecusar, { width: 38, height: 38, flex: undefined, paddingVertical: 0, justifyContent: 'center' }]}
                 onPress={decrementar}
+                activeOpacity={0.7}
               >
-                <Ionicons name="remove" size={20} color="#DA4A02" />
+                <Ionicons name="remove" size={20} color={theme.secondary} />
               </TouchableOpacity>
               <TextInput
                 style={styles.inputPequeno}
@@ -119,8 +133,9 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
               <TouchableOpacity
                 style={[styles.botaoRecusar, { width: 38, height: 38, flex: undefined, paddingVertical: 0, justifyContent: 'center' }]}
                 onPress={incrementar}
+                activeOpacity={0.7}
               >
-                <Ionicons name="add" size={20} color="#DA4A02" />
+                <Ionicons name="add" size={20} color={theme.secondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -132,7 +147,7 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
           <TextInput
             style={styles.inputGrande}
             placeholder="Ex: Tenho alergia a amendoim, preciso de 5 sem carne..."
-            placeholderTextColor="#888888"
+            placeholderTextColor={theme.textMuted}
             multiline
             numberOfLines={3}
             value={observacao}
@@ -142,9 +157,9 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
         </View>
 
         {/* Aviso */}
-        <View style={[styles.cardSolicitacao, { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#E8F5E9', borderColor: '#C8E6C9' }]}>
-          <Ionicons name="information-circle-outline" size={18} color="#006B14" />
-          <Text style={[styles.infoValor, { flex: 1, color: '#006B14', lineHeight: 19 }]}>
+        <View style={[styles.cardSolicitacao, { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: theme.badgeAtivaBg, borderColor: theme.badgeAtivaBorder }]}>
+          <Ionicons name="information-circle-outline" size={18} color={theme.badgeAtivaText} />
+          <Text style={[styles.infoValor, { flex: 1, color: theme.badgeAtivaText, lineHeight: 19 }]}>
             Ao solicitar, o doador receberá uma notificação e poderá aceitar ou recusar seu pedido.
           </Text>
         </View>
@@ -157,7 +172,7 @@ export default function T16_ConfirmarSolicitacao({ navigation, route }) {
           activeOpacity={0.85}
         >
           <Text style={styles.botaoAceitarTexto}>{enviando ? 'Enviando...' : 'Confirmar Solicitação'}</Text>
-          {!enviando && <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />}
+          {!enviando && <Ionicons name="checkmark-circle-outline" size={20} color={theme.buttonTextInverse} />}
         </TouchableOpacity>
 
       </ScrollView>
