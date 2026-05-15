@@ -3,11 +3,20 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   SafeAreaView, StatusBar, TextInput,
 } from 'react-native';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterDoador from './FooterDoador';
 
 export default function T06_CadastrarDoacao({ navigation }) {
   const [dataExpiracao, setDataExpiracao] = useState('');
+
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
 
   const handleDataChange = (texto) => {
     let num = texto.replace(/\D/g, '');
@@ -28,7 +37,11 @@ export default function T06_CadastrarDoacao({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={styles.header_cadastro}>
@@ -47,14 +60,14 @@ export default function T06_CadastrarDoacao({ navigation }) {
         <TextInput
           style={styles.inputCadastro}
           placeholder="Pronto para consumo"
-          placeholderTextColor="#888"
+          placeholderTextColor={theme.textMuted} // Removido '#888'
         />
 
         <Text style={styles.labelCadastro}>Descrição</Text>
         <TextInput
           style={styles.inputCadastro}
           placeholder="Ex: Marmitas de frango com arroz"
-          placeholderTextColor="#888"
+          placeholderTextColor={theme.textMuted} // Removido '#888'
         />
 
         <Text style={styles.labelCadastro}>Quantidade</Text>
@@ -62,14 +75,14 @@ export default function T06_CadastrarDoacao({ navigation }) {
           <TextInput
             style={[styles.inputCadastro, styles.inputMetade]}
             placeholder="10"
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.textMuted} // Removido '#888'
             keyboardType="numeric"
           />
           <View style={styles.espacoEntreInputs} />
           <TextInput
             style={[styles.inputCadastro, styles.inputMetade]}
             placeholder="Unidades"
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.textMuted} // Removido '#888'
           />
         </View>
 
@@ -78,7 +91,7 @@ export default function T06_CadastrarDoacao({ navigation }) {
           <TextInput
             style={styles.inputSemBorda}
             placeholder="dd/mm/aaaa hh:mm"
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.textMuted} // Removido '#888'
             keyboardType="numeric"
             maxLength={16}
             value={dataExpiracao}
@@ -93,7 +106,7 @@ export default function T06_CadastrarDoacao({ navigation }) {
           <TextInput
             style={styles.inputSemBorda}
             placeholder="Usar localização atual"
-            placeholderTextColor="#333"
+            placeholderTextColor={theme.textMuted} // Removido '#333'
           />
         </View>
 
@@ -105,6 +118,7 @@ export default function T06_CadastrarDoacao({ navigation }) {
         <TouchableOpacity
           style={[styles.botaoNovaDoacao, { marginTop: 10 }]}
           onPress={() => navigation.navigate('MinhasDoacoes')}
+          activeOpacity={0.8}
         >
           <Text style={styles.botaoNovaDoacaoTexto}>Publicar Doação</Text>
         </TouchableOpacity>
