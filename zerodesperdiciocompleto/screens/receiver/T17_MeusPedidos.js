@@ -4,7 +4,11 @@ import {
   SafeAreaView, StatusBar, Image, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterReceptor from './FooterReceptor';
 
 const MEUS_PEDIDOS = [
@@ -16,6 +20,11 @@ const MEUS_PEDIDOS = [
 export default function T17_MeusPedidos({ navigation }) {
   const [abaAtiva, setAbaAtiva] = useState('Todos');
 
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
+
   const pedidosFiltrados = MEUS_PEDIDOS.filter((pedido) => {
     if (abaAtiva === 'Todos') return true;
     return pedido.status === abaAtiva;
@@ -23,19 +32,23 @@ export default function T17_MeusPedidos({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, {
         height: 70, flexDirection: 'row', alignItems: 'center',
         justifyContent: 'space-between', paddingTop: Platform.OS === 'android' ? 12 : 8,
       }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack()} activeOpacity={0.8}>
+          <Ionicons name="arrow-back" size={24} color={theme.headerTextInverse} />
         </TouchableOpacity>
         <Text style={[styles.saudacao, { fontSize: 18, paddingBottom: 0 }]}>Meus Pedidos</Text>
-        <TouchableOpacity style={styles.menuIcone}>
-          <Ionicons name="menu" size={24} color="#FFF" />
+        <TouchableOpacity style={styles.menuIcone} activeOpacity={0.7}>
+          <Ionicons name="menu" size={24} color={theme.headerTextInverse} />
         </TouchableOpacity>
       </View>
 
@@ -61,7 +74,7 @@ export default function T17_MeusPedidos({ navigation }) {
       >
         {pedidosFiltrados.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="receipt-outline" size={48} color="#CCC" />
+            <Ionicons name="receipt-outline" size={48} color={theme.textMuted} />
             <Text style={styles.emptyStateTexto}>Nenhum pedido encontrado nessa categoria.</Text>
           </View>
         ) : (
@@ -73,16 +86,16 @@ export default function T17_MeusPedidos({ navigation }) {
                 <View style={styles.cardContentHistorico}>
                   <Text style={styles.cardTitle} numberOfLines={1}>{item.titulo}</Text>
                   <Text style={styles.textoCard} numberOfLines={1}>{item.doador}</Text>
-                  <Text style={{ fontSize: 12, color: '#999999', marginBottom: 8 }}>{item.data}</Text>
+                  <Text style={{ fontSize: 12, color: theme.textMuted, marginBottom: 8 }}>{item.data}</Text>
                   <View style={[
                     styles.badgePendente,
                     isConcluido
-                      ? { backgroundColor: '#E8F5E9', borderColor: '#A8D5B5' }
-                      : { backgroundColor: '#FFF3E0', borderColor: '#F0C49A' },
+                      ? { backgroundColor: theme.badgeAtivaBg, borderColor: theme.badgeAtivaBorder }
+                      : { backgroundColor: theme.badgeBg, borderColor: theme.badgeBorder },
                   ]}>
                     <Text style={[
                       styles.badgePendenteTexto,
-                      isConcluido ? { color: '#006B14' } : { color: '#A0511A' },
+                      isConcluido ? { color: theme.badgeAtivaText } : { color: theme.badgeText },
                     ]}>
                       {item.status}
                     </Text>
