@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import styles from '../../Styles';
+import { View, Text, TextInput, TouchableOpacity, Alert, StatusBar } from 'react-native';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
 
 let GoogleSignin = {
   configure: () => {},
@@ -20,6 +23,10 @@ try {
 }
 
 export default function T02_Login({ navigation }) {
+  // 2. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 3. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
 
   const handleGoogleLogin = async () => {
     try {
@@ -37,13 +44,19 @@ export default function T02_Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* 4. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.background} 
+      />
+
       <Text style={styles.texto_bem_vindo}>Bem-vindo de volta</Text>
       <Text style={styles.texto_acesso_conta}>Acesse sua conta</Text>
 
       <TextInput
         style={styles.input}
         placeholder="E-mail"
-        placeholderTextColor="#888"
+        placeholderTextColor={theme.textMuted} // Substituído '#888'
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -51,11 +64,14 @@ export default function T02_Login({ navigation }) {
         style={styles.input}
         placeholder="Senha"
         secureTextEntry
-        placeholderTextColor="#888"
+        placeholderTextColor={theme.textMuted} // Substituído '#888'
       />
 
-      <TouchableOpacity onPress={() => navigation.navigate('RecuperarSenha')}>
-        <Text style={{ color: '#DA4A02', textAlign: 'right', marginTop: 10, marginRight: 15 }}>
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('RecuperarSenha')}
+        activeOpacity={0.7}
+      >
+        <Text style={{ color: theme.secondary, textAlign: 'right', marginTop: 10, marginRight: 15 }}>
           Esqueci minha senha
         </Text>
       </TouchableOpacity>
@@ -63,17 +79,27 @@ export default function T02_Login({ navigation }) {
       <TouchableOpacity
         style={styles.botao_entrar}
         onPress={() => navigation.navigate('HomeDoador')}
+        activeOpacity={0.8}
       >
         <Text style={styles.texto_botao_entrar}>Entrar</Text>
       </TouchableOpacity>
 
-      <Text style={{ textAlign: 'center', marginVertical: 20, color: '#888' }}>
+      <Text style={{ textAlign: 'center', marginVertical: 20, color: theme.textMuted }}>
         ────────────  ou  ────────────
       </Text>
 
       <TouchableOpacity
-        style={[styles.botao2, { backgroundColor: '#FFF', alignSelf: 'center', borderWidth: 1, borderColor: '#ddd' }]}
+        style={[
+          styles.botao2, 
+          { 
+            backgroundColor: theme.inputBackground, 
+            alignSelf: 'center', 
+            borderWidth: 1, 
+            borderColor: theme.filtroBorder // Limpo do inline
+          }
+        ]}
         onPress={handleGoogleLogin}
+        activeOpacity={0.8}
       >
         <Text style={styles.texto_botao2}>G  Continuar com o Google</Text>
       </TouchableOpacity>
@@ -81,10 +107,11 @@ export default function T02_Login({ navigation }) {
       <TouchableOpacity
         onPress={() => navigation.navigate('Cadastro')}
         style={{ marginTop: 30 }}
+        activeOpacity={0.7}
       >
-        <Text style={{ textAlign: 'center', color: '#555' }}>
+        <Text style={{ textAlign: 'center', color: theme.textSecondary }}>
           Não tem conta?{' '}
-          <Text style={{ color: '#006B14', fontWeight: 'bold' }}>Cadastre-se</Text>
+          <Text style={{ color: theme.primary, fontWeight: 'bold' }}>Cadastre-se</Text>
         </Text>
       </TouchableOpacity>
     </View>
