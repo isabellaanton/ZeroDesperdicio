@@ -4,14 +4,19 @@ import {
   SafeAreaView, StatusBar, Image, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from '../../Styles';
+
+// 1. Importando a função de estilos globais e o hook do contexto
+import { getGlobalStyles } from '../../Styles';
+import { useTheme } from '../../ThemeContext';
+
 import FooterReceptor from './FooterReceptor';
 
-function InfoRow({ icone, label, valor, ultimo }) {
+// 2. Recebendo theme e styles como prop
+function InfoRow({ icone, label, valor, ultimo, theme, styles }) {
   return (
     <View style={[styles.infoRow, ultimo && { borderBottomWidth: 0, paddingBottom: 0 }]}>
       <View style={styles.infoIcone}>
-        <Ionicons name={icone} size={17} color="#006B14" />
+        <Ionicons name={icone} size={17} color={theme.primary} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.infoLabel}>{label}</Text>
@@ -35,17 +40,26 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
     status: 'Disponível',
   };
 
+  // 3. Consumindo o tema atual
+  const { theme, isDarkMode } = useTheme();
+  // 4. Injetando o tema nos estilos
+  const styles = getGlobalStyles(theme);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#006B14" />
+      {/* 5. StatusBar dinâmica */}
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={theme.headerBackground} 
+      />
 
       {/* Header */}
       <View style={[styles.header, {
         height: 70, flexDirection: 'row', alignItems: 'center',
         justifyContent: 'space-between', paddingTop: Platform.OS === 'android' ? 12 : 8,
       }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+          <Ionicons name="arrow-back" size={22} color={theme.headerTextInverse} />
         </TouchableOpacity>
         <Text style={[styles.saudacao, { fontSize: 18, paddingBottom: 0 }]}>Detalhes da Doação</Text>
         <View style={{ width: 38 }} />
@@ -58,14 +72,14 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
       >
         {/* Imagem */}
         <View style={{ borderRadius: 18, overflow: 'hidden', marginBottom: 16, position: 'relative' }}>
-          <Image source={{ uri: doacao.imagem }} style={{ width: '100%', height: 220 }} />
+          <Image source={{ uri: doacao.imagem }} style={{ width: '100%', height: 220, backgroundColor: theme.cardImageBg }} />
           <View style={{
             position: 'absolute', top: 12, right: 12,
             flexDirection: 'row', alignItems: 'center', gap: 6,
-            backgroundColor: 'rgba(0,0,0,0.55)',
+            backgroundColor: 'rgba(0,0,0,0.55)', // Mantido fixo por estar sobre a imagem
             borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5,
           }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#4CAF50' }} />
+            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: theme.badgeAtivaText }} />
             <Text style={{ color: '#FFF', fontSize: 12, fontWeight: '600' }}>{doacao.status}</Text>
           </View>
         </View>
@@ -74,7 +88,7 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
         <View style={{ marginBottom: 20 }}>
           <Text style={styles.nome}>{doacao.nome}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Ionicons name="location-outline" size={15} color="#DA4A02" />
+            <Ionicons name="location-outline" size={15} color={theme.secondary} />
             <Text style={styles.disponivel}>{doacao.distancia} de distância</Text>
           </View>
         </View>
@@ -82,10 +96,11 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
         {/* Informações */}
         <Text style={styles.secaoTitulo}>INFORMAÇÕES</Text>
         <View style={styles.cardSolicitacao}>
-          <InfoRow icone="fast-food-outline"  label="Tipo"           valor={doacao.tipo} />
-          <InfoRow icone="layers-outline"     label="Quantidade"     valor={doacao.quantidade} />
-          <InfoRow icone="time-outline"       label="Disponível até" valor={doacao.disponivel} />
-          <InfoRow icone="location-outline"   label="Endereço"       valor={doacao.endereco} ultimo />
+          {/* 6. Repassando theme e styles pros InfoRows */}
+          <InfoRow icone="fast-food-outline"  label="Tipo"           valor={doacao.tipo} theme={theme} styles={styles} />
+          <InfoRow icone="layers-outline"     label="Quantidade"     valor={doacao.quantidade} theme={theme} styles={styles} />
+          <InfoRow icone="time-outline"       label="Disponível até" valor={doacao.disponivel} theme={theme} styles={styles} />
+          <InfoRow icone="location-outline"   label="Endereço"       valor={doacao.endereco} ultimo theme={theme} styles={styles} />
         </View>
 
         {/* Doador */}
@@ -100,26 +115,26 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
               {[1, 2, 3, 4, 5].map((n) => (
                 <Ionicons key={n} name="star" size={13} color="#FFC107" />
               ))}
-              <Text style={{ fontSize: 12, color: '#888888', marginLeft: 4 }}>{doacao.avaliacao}</Text>
+              <Text style={{ fontSize: 12, color: theme.textMuted, marginLeft: 4 }}>{doacao.avaliacao}</Text>
             </View>
           </View>
           <TouchableOpacity
-            style={{ borderWidth: 1.5, borderColor: '#006B14', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6 }}
+            style={{ borderWidth: 1.5, borderColor: theme.primary, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6 }}
             onPress={() => navigation.navigate('InfoDoador')}
             activeOpacity={0.8}
           >
-            <Text style={{ fontSize: 12, color: '#006B14', fontWeight: '600' }}>Ver perfil</Text>
+            <Text style={{ fontSize: 12, color: theme.primary, fontWeight: '600' }}>Ver perfil</Text>
           </TouchableOpacity>
         </View>
 
         {/* Botões */}
         <TouchableOpacity
-          style={[styles.botaoRecusar, { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 12 }]}
+          style={[styles.botaoRecusar, { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 12, borderColor: theme.primary }]}
           onPress={() => navigation.navigate('MapaDoacoes')}
           activeOpacity={0.85}
         >
-          <Ionicons name="map-outline" size={18} color="#006B14" />
-          <Text style={[styles.botaoRecusarTexto, { color: '#006B14' }]}>Ver no Mapa</Text>
+          <Ionicons name="map-outline" size={18} color={theme.primary} />
+          <Text style={[styles.botaoRecusarTexto, { color: theme.primary }]}>Ver no Mapa</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -128,7 +143,7 @@ export default function T14_DetalheDoacaoReceptor({ navigation, route }) {
           activeOpacity={0.85}
         >
           <Text style={styles.botaoNovaDoacaoTexto}>Solicitar Doação</Text>
-          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+          <Ionicons name="arrow-forward" size={18} color={theme.buttonTextInverse} />
         </TouchableOpacity>
 
         <View style={{ height: 20 }} />
