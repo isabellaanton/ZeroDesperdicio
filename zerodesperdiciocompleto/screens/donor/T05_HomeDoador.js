@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
   StatusBar, SafeAreaView, FlatList, Alert,
 } from 'react-native';
-
-// IMPORTAÇÕES DO TEMA
+import { doc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../../config/firebaseConfig';
 import { getGlobalStyles } from '../../Styles';
 import { useTheme } from '../../ThemeContext';
-
 import FooterDoador from './FooterDoador';
 
 const solicitacoesIniciais = [
@@ -19,12 +18,33 @@ const solicitacoesIniciais = [
 export default function T05_HomeDoador({ navigation }) {
   const [solicitacoes, setSolicitacoes] = useState(solicitacoesIniciais);
   const [ativas, setAtivas] = useState(3);
+  const [nomeUsuario, setNomeUsuario] = useState('João');
+  const [nomeEstabelecimento, setNomeEstabelecimento] = useState('Restaurante Sabor & Arte');
 
-  // CONFIGURAÇÃO DO TEMA
   const { theme, isDarkMode } = useTheme();
   const styles = getGlobalStyles(theme);
 
   const pendentes = solicitacoes.filter((s) => s.status === 'pendente').length;
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userDocRef = doc(db, 'usuarios', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.nome) {
+          setNomeUsuario(data.nome);
+          setNomeEstabelecimento(data.nome);
+        }
+      }
+    }, (error) => {
+      console.error("Erro escutando perfil na T05_HomeDoador:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleAceitar = (id) => {
     setSolicitacoes((prev) =>
@@ -66,9 +86,9 @@ export default function T05_HomeDoador({ navigation }) {
 
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.nomeRestaurante}>Restaurante Sabor & Arte</Text>
-            <Text style={styles.saudacao}>Olá, João!</Text>
+          <View style={{ flex: 1, paddingRight: 10 }}>
+            <Text style={styles.nomeRestaurante} numberOfLines={1}>{nomeEstabelecimento}</Text>
+            <Text style={styles.saudacao}>Olá, {nomeUsuario}!</Text>
           </View>
           <TouchableOpacity style={styles.menuIcone}>
             <Text style={styles.menuIconeTexto}>≡</Text>

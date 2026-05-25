@@ -1,25 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView,
-  SafeAreaView, StatusBar, Alert
+  View, Text, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { doc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../../config/firebaseConfig';
 import { getGlobalStyles } from '../../Styles';
 import { useTheme } from '../../ThemeContext';
 import FooterReceptor from './FooterReceptor';
 import ResumoPerfil from '../../ResumoPerfil';
 
-// Agora os dados são da Maria de Lourdes, para bater com o Perfil T20
-const RECEPTOR = {
-  nome: 'Maria de Lourdes',
+const staticProfileMetadata = {
   tipo: 'Receptor Individual',
   membro_desde: 'mar/2023',
   stats: { recebidas: 63, avaliacao: '4.3' },
   endereco: 'Bairro de Fátima, Fortaleza - CE',
-  telefone: '(85) 9 9988-7766',
-  email: 'maria.lourdes@email.com',
-  sobre: 'Faço parte de uma rede de apoio comunitário que ajuda 20 famílias no bairro. Busco doações para complementar as refeições dessas pessoas.',
 };
 
 const InfoRow = ({ icone, label, valor, ultimo, styles, theme, isDarkMode }) => (
@@ -37,6 +32,31 @@ const InfoRow = ({ icone, label, valor, ultimo, styles, theme, isDarkMode }) => 
 export default function T18_InfoReceptor({ navigation }) {
   const { theme, isDarkMode } = useTheme();
   const styles = getGlobalStyles(theme);
+
+  const [nome, setNome] = useState('Maria de Lourdes');
+  const [telefone, setTelefone] = useState('(85) 9 9988-7766');
+  const [email, setEmail] = useState('maria.lourdes@email.com');
+  const [sobre, setSobre] = useState('Faço parte de uma rede de apoio comunitário que ajuda 20 famílias no bairro. Busco doações para complementar as refeições dessas pessoas.');
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const docRef = doc(db, 'usuarios', user.uid);
+    const unsubscribe = onSnapshot(docRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.nome) setNome(data.nome);
+        if (data.telefone) setTelefone(data.telefone);
+        if (data.email) setEmail(data.email);
+        if (data.sobre) setSobre(data.sobre);
+      }
+    }, (error) => {
+      console.error("Erro no listener da T18_InfoReceptor:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -62,13 +82,12 @@ export default function T18_InfoReceptor({ navigation }) {
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
       >
-        {/* Usando os mesmos dados da T20 */}
         <ResumoPerfil
           emoji="🏘️"
-          nome={RECEPTOR.nome}
-          subtitulo={`${RECEPTOR.tipo} desde ${RECEPTOR.membro_desde}`}
+          nome={nome}
+          subtitulo={`${staticProfileMetadata.tipo} desde ${staticProfileMetadata.membro_desde}`}
           stats={[
-            { valor: RECEPTOR.stats.recebidas, label: 'Recebidas' },
+            { valor: staticProfileMetadata.stats.recebidas, label: 'Recebidas' },
             { valor: '4,3⭐', label: 'Avaliação' },
             { valor: '180kg', label: 'Alimentos' },
           ]}
@@ -79,7 +98,7 @@ export default function T18_InfoReceptor({ navigation }) {
           <InfoRow 
             icone="location-outline" 
             label="Localização" 
-            valor={RECEPTOR.endereco} 
+            valor={staticProfileMetadata.endereco} 
             styles={styles} 
             theme={theme} 
             isDarkMode={isDarkMode} 
@@ -87,7 +106,7 @@ export default function T18_InfoReceptor({ navigation }) {
           <InfoRow 
             icone="call-outline" 
             label="Telefone / WhatsApp" 
-            valor={RECEPTOR.telefone} 
+            valor={telefone} 
             styles={styles} 
             theme={theme} 
             isDarkMode={isDarkMode} 
@@ -95,7 +114,7 @@ export default function T18_InfoReceptor({ navigation }) {
           <InfoRow 
             icone="mail-outline" 
             label="E-mail de Contato" 
-            valor={RECEPTOR.email} 
+            valor={email} 
             ultimo 
             styles={styles} 
             theme={theme} 
@@ -107,7 +126,7 @@ export default function T18_InfoReceptor({ navigation }) {
         <View style={styles.cardSolicitacao}>
           <View style={{ flexDirection: 'row', padding: 5 }}>
             <Text style={[styles.descricaoSolicitacao, { color: theme.text, lineHeight: 22 }]}>
-              {RECEPTOR.sobre}
+              {sobre}
             </Text>
           </View>
         </View>

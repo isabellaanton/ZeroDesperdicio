@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, TextInput,
-  SafeAreaView, StatusBar, Switch, Platform, Alert, KeyboardAvoidingView
+  SafeAreaView, StatusBar, Switch, Platform, Alert, KeyboardAvoidingView, ActivityIndicator
 } from 'react-native';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
-
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { verifyBeforeUpdateEmail } from 'firebase/auth';
+import { auth, db } from '../../config/firebaseConfig';
 import { getGlobalStyles } from '../../Styles';
 import { useTheme } from '../../ThemeContext';
 import FooterDoador from './FooterDoador';
 import ResumoPerfil from '../../ResumoPerfil';
 
-// Componente FAQ
 const FAQItem = ({ pergunta, resposta, theme, styles }) => {
   const [expandido, setExpandido] = useState(false);
   return (
@@ -40,6 +41,7 @@ export default function T11_PerfilDoador({ navigation }) {
   const [exibirAjuda, setExibirAjuda] = useState(false);
   const [editando, setEditando] = useState(false);
   const [notificacoesAtivas, setNotificacoesAtivas] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
   // --- ESTADOS DOS DADOS ---
   const [nome, setNome] = useState('Restaurante Sabor & Arte');
@@ -66,7 +68,33 @@ export default function T11_PerfilDoador({ navigation }) {
     }
   ];
 
-  // Lógica de Notificações com Alertas
+  useEffect(() => {
+    const carregarPerfil = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      setCarregando(true);
+      try {
+        const userDocRef = doc(db, 'usuarios', user.uid);
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.nome) setNome(data.nome);
+          if (data.telefone) setTelefone(data.telefone);
+          if (data.email) setEmail(data.email);
+          if (data.sobre !== undefined) setSobre(data.sobre);
+        }
+      } catch (error) {
+        const msg = 'Não conseguimos obter os seus dados cadastrais do banco de dados.';
+        Platform.OS === 'web' ? alert(msg) : Alert.alert('Erro ao carregar', msg);
+      } finally {
+        setCarregando(false);
+      }
+    };
+    
+    carregarPerfil();
+  }, []);
+
   const gerenciarNotificacoes = async () => {
     if (!notificacoesAtivas) {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -88,12 +116,69 @@ export default function T11_PerfilDoador({ navigation }) {
     }
   };
 
-  const handleSalvarEdicao = () => {
-    setEditando(false);
-    Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+  const handleSalvarEdicao = async () => {
+    if (!nome.trim() || !telefone.trim() || !email.trim()) {
+      const msg = 'Os campos Nome, Telefone e E-mail devem estar preenchidos.';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Campos inválidos', msg);
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    setCarregando(true);
+    try {
+      let emailPrecisaConfirmacao = false;
+
+      // 1. Atualizar o e-mail no Firebase Auth (se foi alterado)
+      if (email.trim() !== user.email) {
+        // Nova função de segurança do Firebase:
+        await verifyBeforeUpdateEmail(user, email.trim());
+        emailPrecisaConfirmacao = true;
+      }
+
+      // 2. Salvar no Firestore
+      const userDocRef = doc(db, 'usuarios', user.uid);
+      await setDoc(userDocRef, {
+        nome: nome,
+        telefone: telefone,
+        email: email.trim(), // Atualiza visualmente no app
+        sobre: sobre
+      }, { merge: true });
+
+      setEditando(false);
+
+      // Feedback dinâmico baseado na alteração do e-mail
+      if (emailPrecisaConfirmacao) {
+        const msgEmail = "Perfil salvo! Enviamos um link de verificação para o seu novo e-mail. Clique nele para efetivar a troca no login.";
+        Platform.OS === 'web' ? alert(msgEmail) : Alert.alert("Quase lá!", msgEmail);
+      } else {
+        const msgSucesso = "Perfil atualizado com sucesso!";
+        Platform.OS === 'web' ? alert(msgSucesso) : Alert.alert("Sucesso", msgSucesso);
+      }
+      
+    } catch (error) {
+      console.log("Erro detalhado ao salvar perfil:", error);
+      
+      let tituloErro = "Erro do Firebase";
+      let msgErro = error.message || error.code || "Erro desconhecido";
+
+      if (error.code === 'auth/requires-recent-login') {
+        tituloErro = "Segurança do Firebase";
+        msgErro = "Por motivos de segurança, para alterar o e-mail, é necessário ter feito login recentemente. Saia da conta, faça login novamente e tente de novo.";
+      } else if (error.code === 'auth/email-already-in-use') {
+        msgErro = "Este e-mail já está sendo utilizado por outra conta.";
+      } else if (error.code === 'auth/invalid-email') {
+        msgErro = "O formato do e-mail inserido é inválido.";
+      }
+
+      Platform.OS === 'web' ? alert(`${tituloErro}:\n\n${msgErro}`) : Alert.alert(tituloErro, msgErro);
+    } finally {
+      setCarregando(false);
+    }
   };
 
-  const InfoRow = ({ icone, label, valor, onChange, ultimo }) => (
+  const InfoRow = ({ icone, label, valor, onChange, ultimo, keyboardType, autoCapitalize }) => (
     <View style={[styles.infoRow, ultimo && { borderBottomWidth: 0, paddingBottom: 0 }]}>
       <View style={[styles.infoIcone, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#E8F5E9' }]}>
         <Ionicons name={icone} size={18} color={theme.primary} />
@@ -102,9 +187,12 @@ export default function T11_PerfilDoador({ navigation }) {
         <Text style={styles.infoLabel}>{label}</Text>
         {editando ? (
           <TextInput 
-            style={[styles.infoValor, { color: theme.primary, borderBottomWidth: 0.5, borderBottomColor: theme.primary, paddingVertical: 2 }]} 
+            style={[styles.infoValor, { color: theme.primary, borderBottomWidth: 0.5, borderBottomColor: theme.primary, paddingVertical: 2, outlineStyle: 'none' }]} 
             value={valor} 
             onChangeText={onChange}
+            editable={!carregando}
+            keyboardType={keyboardType}
+            autoCapitalize={autoCapitalize || "none"}
           />
         ) : (
           <Text style={styles.infoValor}>{valor}</Text>
@@ -123,7 +211,7 @@ export default function T11_PerfilDoador({ navigation }) {
           if (editando) setEditando(false);
           else if (exibirAjuda) setExibirAjuda(false);
           else navigation.goBack();
-        }}>
+        }} disabled={carregando}>
           <Ionicons name={(exibirAjuda || editando) ? "arrow-back" : "menu"} size={24} color={theme.headerTextInverse} />
         </TouchableOpacity>
         
@@ -131,12 +219,18 @@ export default function T11_PerfilDoador({ navigation }) {
           {editando ? "Editar Perfil" : exibirAjuda ? "Ajuda e Suporte" : "Meu Perfil"}
         </Text>
 
-        <TouchableOpacity onPress={() => editando ? handleSalvarEdicao() : setEditando(true)}>
+        <TouchableOpacity onPress={() => editando ? handleSalvarEdicao() : setEditando(true)} disabled={carregando || exibirAjuda}>
           <Ionicons name={editando ? "checkmark-sharp" : "ellipsis-vertical"} size={24} color={theme.headerTextInverse} />
         </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        {carregando && (
+          <View style={{ paddingVertical: 10, backgroundColor: theme.background }}>
+            <ActivityIndicator size="small" color={theme.primary} />
+          </View>
+        )}
+
         <ScrollView style={styles.conteudo} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           
           {exibirAjuda ? (
@@ -174,23 +268,24 @@ export default function T11_PerfilDoador({ navigation }) {
                 <View style={{ marginTop: 10 }}>
                   <Text style={styles.secaoTitulo}>Informações Pessoais</Text>
                   <View style={styles.cardSolicitacao}>
-                    <InfoRow icone="storefront-outline" label="Nome do Estabelecimento" valor={nome} onChange={setNome} />
-                    <InfoRow icone="call-outline" label="Telefone / WhatsApp" valor={telefone} onChange={setTelefone} />
-                    <InfoRow icone="mail-outline" label="E-mail" valor={email} onChange={setEmail} ultimo />
+                    <InfoRow icone="storefront-outline" label="Nome do Estabelecimento" valor={nome} onChange={setNome} autoCapitalize="words" />
+                    <InfoRow icone="call-outline" label="Telefone / WhatsApp" valor={telefone} onChange={setTelefone} keyboardType="phone-pad" />
+                    <InfoRow icone="mail-outline" label="E-mail de Login" valor={email} onChange={setEmail} keyboardType="email-address" ultimo />
                   </View>
 
                   <Text style={styles.secaoTitulo}>Sobre Você</Text>
                   <View style={styles.cardSolicitacao}>
                     <TextInput 
-                      style={[styles.descricaoSolicitacao, { color: theme.text, minHeight: 80, padding: 10 }]} 
+                      style={[styles.descricaoSolicitacao, { color: theme.text, minHeight: 80, padding: 10, outlineStyle: 'none' }]} 
                       value={sobre} 
                       onChangeText={setSobre} 
                       multiline 
+                      editable={!carregando}
                     />
                   </View>
 
-                  <TouchableOpacity style={[styles.botao_entrar, { marginTop: 20 }]} onPress={handleSalvarEdicao}>
-                    <Text style={styles.texto_botao_entrar}>Confirmar Alterações</Text>
+                  <TouchableOpacity style={[styles.botao_entrar, { marginTop: 20 }]} onPress={handleSalvarEdicao} disabled={carregando}>
+                    <Text style={styles.text_botao_entrar || styles.texto_botao_entrar}>Confirmar Alterações</Text>
                   </TouchableOpacity>
                 </View>
               ) : (

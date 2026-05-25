@@ -1,31 +1,60 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  SafeAreaView, StatusBar, ScrollView, Platform, Alert
+  SafeAreaView, StatusBar, ScrollView, Platform, Alert, ActivityIndicator
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Importando a função de estilos globais e o hook do contexto
+// 1. IMPORTAÇÕES DO FIREBASE ADICIONADAS AQUI
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../config/firebaseConfig';
+
 import { getGlobalStyles } from '../../Styles';
 import { useTheme } from '../../ThemeContext';
 
 export default function T04_RecuperarSenha({ navigation }) {
   const [email, setEmail] = useState('');
   const [enviado, setEnviado] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
-  // Consumindo o tema atual
   const { theme, isDarkMode } = useTheme();
-  // Injetando o tema nos estilos
   const styles = getGlobalStyles(theme);
 
-  const handleEnviarEmail = () => {
-    if (!email.includes('@')) {
-      Alert.alert('Erro', 'Digite um e-mail válido.');
+  const handleEnviarEmail = async () => {
+    if (!email || !email.includes('@')) {
+      const msg = 'Digite um e-mail válido para receber o link.';
+      Platform.OS === 'web' ? alert(msg) : Alert.alert('Erro', msg);
       return;
     }
     
-    // Aqui você chamaria: await sendPasswordResetEmail(auth, email)
-    setEnviado(true);
+    setCarregando(true);
+    
+    try {
+      // 2. CHAMADA REAL AO FIREBASE
+      await sendPasswordResetEmail(auth, email);
+      setEnviado(true);
+    } catch (error) {
+      console.log("Erro ao recuperar senha:", error);
+      
+      let titulo = "Falha no Envio";
+      let mensagem = "Não foi possível enviar o link de redefinição.";
+      
+      if (error.code === 'auth/user-not-found') {
+        mensagem = "Não localizamos nenhuma conta com este e-mail.";
+      } else if (error.code === 'auth/invalid-email') {
+        mensagem = "Formato de e-mail inválido.";
+      } else if (error.code === 'auth/too-many-requests') {
+        mensagem = "Muitas tentativas. Aguarde um momento e tente novamente.";
+      }
+
+      if (Platform.OS === 'web') {
+        alert(`${titulo}: ${mensagem}`);
+      } else {
+        Alert.alert(titulo, mensagem);
+      }
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
@@ -41,6 +70,7 @@ export default function T04_RecuperarSenha({ navigation }) {
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
           activeOpacity={0.8}
+          disabled={carregando}
         >
           <MaterialCommunityIcons name="arrow-left" size={22} color={theme.headerTextInverse} />
         </TouchableOpacity>
@@ -58,22 +88,28 @@ export default function T04_RecuperarSenha({ navigation }) {
             <View style={styles.inputCadastroIcone}>
               <MaterialCommunityIcons name="email-outline" size={20} color={theme.textMuted} style={{ marginRight: 10 }} />
               <TextInput
-                style={styles.inputSemBorda}
+                style={[styles.inputSemBorda, {flex: 1, outlineStyle: 'none'}]}
                 placeholder="seu@email.com"
                 placeholderTextColor={theme.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
+                editable={!carregando}
               />
             </View>
 
             <TouchableOpacity
-              style={[styles.botao_entrar, !email.includes('@') && { backgroundColor: theme.gray, elevation: 0 }]}
+              style={[styles.botao_entrar, (!email.includes('@') || carregando) && { backgroundColor: theme.gray, elevation: 0 }]}
               onPress={handleEnviarEmail}
               activeOpacity={0.8}
+              disabled={carregando}
             >
-              <Text style={styles.texto_botao_entrar}>Enviar link de recuperação</Text>
+              {carregando ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.texto_botao_entrar}>Enviar link de recuperação</Text>
+              )}
             </TouchableOpacity>
           </View>
         ) : (

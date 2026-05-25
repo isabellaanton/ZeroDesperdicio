@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
   StatusBar, SafeAreaView, TextInput, Image, Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import { doc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../../config/firebaseConfig';
 import { getGlobalStyles } from '../../Styles';
 import { useTheme } from '../../ThemeContext';
 import FooterReceptor from './FooterReceptor';
 
-// 1. CONSTANTES DEFINIDAS AQUI (Ajuste para as categorias reais do seu app)
 const CATEGORIAS = ['Todos', 'Cestas Básicas', 'Refeições', 'Hortifruti', 'Outros'];
 
-// 2. DADOS DE EXEMPLO (Substitua depois pelos dados reais do seu banco de dados/API)
 const DOACOES_DISPONIVEIS = [
   { 
     id: '1', 
@@ -41,23 +40,36 @@ const DOACOES_DISPONIVEIS = [
 ];
 
 export default function T12_HomeReceptor({ navigation }) {
-  // Estados para gerenciar a busca e a categoria selecionada
   const [categoriaAtiva, setCategoriaAtiva] = useState('Todos');
   const [textoBusca, setTextoBusca] = useState('');
+  const [nomeUsuario, setNomeUsuario] = useState('Maria');
 
-  // Trazendo o tema dinâmico
   const { theme, isDarkMode } = useTheme();
   const styles = getGlobalStyles(theme);
 
-  // 3. LÓGICA DE FILTRAGEM (Filtra por categoria e pelo que for digitado na busca)
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userDocRef = doc(db, 'usuarios', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.nome) {
+          setNomeUsuario(data.nome);
+        }
+      }
+    }, (error) => {
+      console.error("Erro escutando perfil na T12_HomeReceptor:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const itensFiltrados = DOACOES_DISPONIVEIS.filter((item) => {
-    // Verifica se a categoria bate (ou se 'Todos' está selecionado)
     const matchCategoria = categoriaAtiva === 'Todos' || item.categoria === categoriaAtiva;
-    
-    // Verifica se o texto da busca existe no título ou no nome do doador
     const matchBusca = item.titulo.toLowerCase().includes(textoBusca.toLowerCase()) || 
                        item.doador.toLowerCase().includes(textoBusca.toLowerCase());
-    
     return matchCategoria && matchBusca;
   });
 
@@ -77,7 +89,7 @@ export default function T12_HomeReceptor({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Text style={[styles.saudacao, { paddingBottom: 15 }]}>Olá, Maria!</Text>
+        <Text style={[styles.saudacao, { paddingBottom: 15 }]}>Olá, {nomeUsuario}!</Text>
 
         <View style={styles.resumoContainer}>
           <View style={[styles.resumoCard, styles.resumoCardDestaque, { backgroundColor: theme.secondary }]}>
@@ -100,7 +112,6 @@ export default function T12_HomeReceptor({ navigation }) {
         contentContainerStyle={styles.conteudoContainerHomeDoador}
         showsVerticalScrollIndicator={false}
       >
-        
         {/* BUSCA INTEGRADA FUNCIONAL */}
         <View style={[styles.searchContainer, { marginBottom: 20 }]}>
           <Ionicons name="search" size={20} color={theme.textMuted} style={{ marginRight: 8 }} />
