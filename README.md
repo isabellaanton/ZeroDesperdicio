@@ -1,11 +1,53 @@
-# Sample Snack app
+<div align="center">
+  <h1>♻️ ZeroDisperdicio</h1>
+  <p>
+    <b>Connecting food donors with people and organizations in need.</b>
+  </p>
+  
+  <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
+</div>
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+<br/>
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+## 📖 Description
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+**ZeroDisperdicio** is a mobile application designed to connect food donors with people and organizations in need. Our goal is to reduce food waste and help feed more people by making the donation process quick, easy, and accessible.
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+<hr/>
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+## ✨ Features
+
+<ul>
+  <li>👤 <b>Dual Profiles:</b> Separate and customized experiences for Donors and Receivers.</li>
+  <li>📦 <b>Donation Management:</b> Donors can easily register, manage, and track available food donations.</li>
+  <li>🗺️ <b>Interactive Map:</b> Receivers can find available donations nearby using an interactive map.</li>
+  <li>🔍 <b>Smart Filtering:</b> Filter donations by category, distance, and availability.</li>
+  <li>⏱️ <b>Real-time Tracking:</b> Track donation requests and manage approvals (accept/reject) in real-time.</li>
+  <li>📶 <b>Offline Support:</b> Receivers can access their request history and donor details even with an unstable internet connection using local <i>AsyncStorage</i> cache.</li>
+  <li>🌗 <b>Dark Mode:</b> Full support for Light and Dark themes to enhance user experience.</li>
+</ul>
+
+<hr/>
+
+## 💻 Technologies
+
+This project was built using the following technologies:
+
+<table>
+  <tr>
+    <td><b>Framework</b></td>
+    <td>React Native & Expo</td>
+  </tr>
+  <tr>
+    <td><b>Backend & Auth</b></td>
+    <td>Firebase (Authentication & Firestore)</td>
+  </tr>
+  <tr>
+    <td><b>Navigation</b></td>
+    <td>React Navigation</td>
+  </tr>
+  <tr>
+    <td><b>Storage</b></td>
+    <td>AsyncStorage (Local Cache & Offline Support)</td>
